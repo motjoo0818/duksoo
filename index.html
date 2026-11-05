@@ -3,639 +3,1276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>덕수궁 수학·역사 현장 탐구</title>
+  <title>덕수궁 역사·수학 현장 탐구 퀘스트</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            palace: {
+              navy: '#192a42',
+              dark: '#0f172a',
+              gold: '#c59b27',
+              goldLight: '#fcf8ee',
+              teal: '#0a6458',
+              red: '#991b1b',
+              hanji: '#f9f6f0'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { -webkit-tap-highlight-color: transparent; }
-    .scrollbar-none::-webkit-scrollbar { display: none; }
-    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-    .slide-curve {
-      background: linear-gradient(180deg, #1898b5 0%, #38bdf8 65%, #f8fafc 100%);
-      border-radius: 0 0 50% 50% / 0 0 24px 24px;
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Song+Myung&display=swap');
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .font-heritage {
+      font-family: 'Song Myung', serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Touch canvas pointer events */
+    canvas {
+      touch-action: none;
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans pb-24">
+<body class="bg-slate-900 text-slate-800 min-h-screen flex justify-center items-center p-0 sm:p-4">
 
-  <!-- 상단 네비게이션 헤더 -->
-  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-2.5 shadow-sm flex items-center justify-between">
-    <div class="flex items-center space-x-2">
-      <span class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow">덕</span>
-      <div>
-        <h1 class="text-xs font-bold text-slate-900 leading-none">덕수궁 매쓰 투어</h1>
-        <span id="navTeamInfo" class="text-[11px] text-teal-700 font-semibold">입장 대기 중</span>
-      </div>
-    </div>
-    <button id="btnOpenReport" onclick="openReportModal()" class="hidden px-2.5 py-1 bg-slate-800 text-white rounded-lg text-xs font-bold shadow hover:bg-slate-900">
-      답안 모아보기
-    </button>
-  </header>
+  <!-- Main Mobile App Shell -->
+  <div id="appContainer" class="w-full max-w-md h-screen sm:h-[860px] bg-palace-hanji flex flex-col shadow-2xl sm:rounded-3xl overflow-hidden relative border border-slate-300">
 
-  <!-- 메인 컨테이너 -->
-  <main class="max-w-md mx-auto p-3 space-y-3">
-
-    <!-- 0. 첫 화면: 조 번호 & 조원 이름 입력 카드 -->
-    <section id="loginSection" class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 text-center space-y-4 my-2">
-      <div class="w-16 h-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
-        🏛️
-      </div>
-      <div>
-        <h2 class="text-lg font-black text-slate-900">덕수궁 현장 탐구 입장</h2>
-        <p class="text-xs text-slate-500 mt-1">우리 조 번호와 함께하는 조원들의 이름을 적어주세요.</p>
-      </div>
-
-      <div class="space-y-3 text-left pt-2">
+    <!-- Top Sticky Header -->
+    <header class="bg-palace-navy text-white px-4 py-3 flex items-center justify-between shadow-md z-30 shrink-0">
+      <div class="flex items-center space-x-2.5">
+        <button onclick="goToScreen('map')" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-palace-gold flex items-center justify-center transition">
+          <i class="fa-solid fa-map-location-dot text-base"></i>
+        </button>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">1. 조 번호 선택</label>
-          <select id="inputTeamNum" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 font-bold focus:ring-teal-500 focus:border-teal-500">
-            <option value="1조">1조</option>
-            <option value="2조">2조</option>
-            <option value="3조">3조</option>
-            <option value="4조">4조</option>
-            <option value="5조">5조</option>
-            <option value="6조">6조</option>
-            <option value="7조">7조</option>
-            <option value="8조">8조</option>
-          </select>
+          <div class="flex items-center gap-1.5">
+            <span class="bg-amber-500 text-palace-navy font-black text-[10px] px-1.5 py-0.5 rounded">현장용</span>
+            <h1 class="text-xs font-bold tracking-tight text-yellow-100">덕수궁 야외 탐구 런닝맨</h1>
+          </div>
+          <p id="headerTeamText" class="text-[11px] text-slate-300 font-medium">모둠 등록 필요</p>
         </div>
+      </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">2. 조원 이름 입력</label>
-          <input type="text" id="inputMembers" placeholder="예: 김민수, 이서연, 박준호" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-teal-500 focus:border-teal-500">
+      <div class="flex items-center gap-2">
+        <div class="bg-black/40 px-2 py-1 rounded-lg border border-amber-500/30 text-right">
+          <span class="text-[9px] text-amber-300 block leading-none font-bold">진행도</span>
+          <span id="headerProgress" class="text-xs font-extrabold text-white">0 / 10</span>
         </div>
-
-        <button type="button" onclick="handleStartTour()" class="w-full mt-2 py-3.5 bg-teal-600 hover:bg-teal-700 active:scale-98 text-white rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center space-x-1">
-          <span>미션 시작하기 (입장)</span>
-          <span>➔</span>
+        <button onclick="resetDataConfirm()" title="초기화" class="text-slate-400 hover:text-red-400 p-1 text-xs">
+          <i class="fa-solid fa-rotate-right"></i>
         </button>
       </div>
-    </section>
+    </header>
 
-    <!-- 1~10번 슬라이드 미션 카드 영역 -->
-    <div id="missionDeck" class="hidden space-y-3">
-      
-      <!-- 1~10번 슬라이드 탭 버튼 바 -->
-      <div class="flex items-center space-x-1.5 overflow-x-auto py-1 scrollbar-none" id="tabsWrapper"></div>
+    <!-- Sub Status Progress Bar -->
+    <div class="w-full bg-slate-200 h-1.5 shrink-0">
+      <div id="globalProgressBar" class="bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+    </div>
 
-      <!-- 슬라이드 본체 카드 -->
-      <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
-        
-        <!-- 슬라이드 상단 곡선 헤더 -->
-        <div class="slide-curve pt-4 pb-6 px-4 text-center">
-          <h2 id="viewSlideNum" class="text-xl font-black text-slate-900 tracking-wider font-mono drop-shadow-sm">[1번]</h2>
-        </div>
+    <!-- Main Screens Container -->
+    <main id="mainContent" class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col">
 
-        <!-- 슬라이드 사진 박스 -->
-        <div class="px-4 -mt-2">
-          <div class="w-full aspect-[16/10] bg-slate-200 rounded-2xl overflow-hidden shadow border border-slate-200 flex items-center justify-center">
-            <img id="viewSlideImg" src="" alt="슬라이드 사진" class="w-full h-full object-cover">
+      <!-- SCREEN 1: INTRO & TEAM REGISTRATION -->
+      <section id="screenIntro" class="flex-1 p-5 flex flex-col justify-between bg-gradient-to-b from-palace-navy via-slate-800 to-palace-dark text-white">
+        <div class="my-auto text-center">
+          <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-1 shadow-xl flex items-center justify-center">
+            <div class="w-full h-full bg-palace-navy rounded-xl flex items-center justify-center text-3xl text-yellow-400">
+              <i class="fa-solid fa-shoe-prints"></i>
+            </div>
+          </div>
+          <span class="inline-block px-3 py-1 bg-yellow-400/20 text-yellow-300 rounded-full text-xs font-semibold mb-2">
+            덕수궁 역사 [H] × 수학 [M] 현장 미션
+          </span>
+          <h2 class="text-2xl font-extrabold font-heritage text-yellow-100 leading-tight">
+            덕수궁 발로 뛰는<br><span class="text-yellow-400">스마트 현장 탐구 투어</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            스마트폰 카메라로 사진과 영상을 남기고, 궁궐 곳곳의 각도와 비율, 칸을 직접 측정해보세요!
+          </p>
+
+          <div class="mt-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-left space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-yellow-200 mb-1">
+                <i class="fa-solid fa-users mr-1"></i> 우리 모둠(팀) 번호/이름
+              </label>
+              <input type="text" id="teamInputName" placeholder="예: 3모둠 (정관헌 수색대)" 
+                class="w-full px-3 py-2 rounded-xl bg-black/40 border border-slate-600 text-white placeholder-slate-400 text-xs focus:outline-none focus:border-yellow-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-yellow-200 mb-1">
+                <i class="fa-solid fa-user-group mr-1"></i> 모둠원 명단
+              </label>
+              <input type="text" id="teamInputMembers" placeholder="예: 김민수, 이지우, 박서준, 최유진" 
+                class="w-full px-3 py-2 rounded-xl bg-black/40 border border-slate-600 text-white placeholder-slate-400 text-xs focus:outline-none focus:border-yellow-400" />
+            </div>
           </div>
         </div>
 
-        <!-- 슬라이드 지문 및 미션 구역 -->
-        <div class="p-4 space-y-3">
-          <div id="viewSlideDesc" class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50 p-3.5 rounded-2xl border border-slate-100"></div>
+        <div class="pt-4">
+          <button onclick="registerTeamAndStart()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-palace-dark font-extrabold text-sm rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+            <span>덕수궁 현장 탐구 시작하기</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </section>
 
-          <!-- 동적 입력 폼 -->
-          <div id="viewInteractiveZone" class="pt-2 border-t border-slate-100 space-y-3"></div>
+      <!-- SCREEN 2: MISSION MAP & DASHBOARD -->
+      <section id="screenMap" class="hidden flex-1 p-4 bg-palace-hanji flex flex-col space-y-3">
+        <!-- Location Alert Card -->
+        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400 font-semibold uppercase">탐구 코스 안내</p>
+              <h4 class="text-xs font-bold text-slate-800">대한문 ➔ 함녕전 ➔ 석어당 ➔ 중화전 ➔ 미술관</h4>
+            </div>
+          </div>
+          <button onclick="showPalaceMapModal()" class="text-[11px] font-bold text-teal-700 bg-teal-50 px-2.5 py-1.5 rounded-lg border border-teal-200 active:scale-95 transition">
+            지도 보기
+          </button>
+        </div>
 
-          <!-- 저장 토스트 -->
-          <div id="saveToast" class="hidden p-2.5 bg-teal-50 border border-teal-200 text-teal-800 rounded-xl text-xs font-bold text-center">
-            ✓ 답안이 실시간 저장되었습니다!
+        <!-- 10 Mission Grid / List -->
+        <div class="flex justify-between items-center px-1">
+          <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+            <i class="fa-solid fa-flag-checkered text-amber-600"></i> 미션 리스트 (1~10)
+          </span>
+          <span class="text-[11px] text-slate-500">순서대로 또는 자유 탐색</span>
+        </div>
+
+        <div id="missionCardContainer" class="flex-1 overflow-y-auto no-scrollbar space-y-2.5 pb-16">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Sticky Floating Finish button -->
+        <div id="finishReportBtnWrap" class="hidden sticky bottom-2 left-0 right-0 z-20">
+          <button onclick="goToScreen('report')" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-sm rounded-xl shadow-xl flex items-center justify-center gap-2 animate-bounce">
+            <i class="fa-solid fa-clipboard-check text-yellow-300 text-base"></i>
+            <span>모든 미션 완료! 최종 탐구 보고서 확인</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: INTERACTIVE MISSION RUNNER -->
+      <section id="screenMission" class="hidden flex-1 p-4 bg-palace-hanji flex flex-col justify-between overflow-y-auto no-scrollbar">
+        <!-- Content will be injected dynamically per mission -->
+        <div id="missionDetailBody"></div>
+      </section>
+
+      <!-- SCREEN 4: FINAL REPORT & SUBMISSION -->
+      <section id="screenReport" class="hidden flex-1 p-4 bg-slate-100 flex flex-col justify-between overflow-y-auto no-scrollbar">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4" id="reportPrintArea">
+          <div class="text-center border-b pb-3 mb-3 border-amber-200">
+            <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">현장 체험학습 완료</span>
+            <h2 class="text-lg font-black font-heritage text-slate-800 mt-1">덕수궁 역사·수학 융합 탐구 결과 보고서</h2>
+            <div class="mt-2 flex justify-between text-xs text-slate-600 px-2">
+              <span><b>모둠:</b> <span id="repTeam"></span></span>
+              <span><b>일자:</b> <span id="repDate"></span></span>
+            </div>
+            <div class="text-left text-xs text-slate-500 px-2 mt-1">
+              <b>모둠원:</b> <span id="repMembers"></span>
+            </div>
+          </div>
+
+          <div class="space-y-3" id="reportItemsContainer">
+            <!-- Populated summary of all 10 missions -->
           </div>
         </div>
 
-        <!-- 하단 네비게이션 버튼 -->
-        <div class="bg-slate-50 border-t border-slate-200 px-4 py-3 flex items-center justify-between">
-          <button onclick="moveSlide(-1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 shadow-sm">
-            ◀ 이전
+        <div class="space-y-2 pb-6 shrink-0">
+          <button onclick="shareOrCopyReport()" class="w-full py-3 bg-palace-navy text-yellow-300 font-bold rounded-xl shadow flex items-center justify-center gap-2 text-xs active:scale-95">
+            <i class="fa-solid fa-copy"></i>
+            <span>탐구 결과 텍스트 복사 (선생님 카톡/패들렛 제출)</span>
           </button>
-          <button onclick="saveCurrentData()" class="px-5 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow">
-            답안 저장
-          </button>
-          <button onclick="moveSlide(1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 shadow-sm">
-            다음 ▶
+          <button onclick="goToScreen('map')" class="w-full py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs active:scale-95">
+            미션 목록으로 돌아가기
           </button>
         </div>
+      </section>
 
-      </div>
+    </main>
 
-      <!-- 최종 보고서 확인 버튼 -->
-      <button onclick="openReportModal()" class="w-full py-3.5 bg-gradient-to-r from-teal-700 via-teal-600 to-slate-800 text-white rounded-2xl font-bold text-sm shadow-md flex items-center justify-center space-x-2">
-        <span>모둠 전체 답안 검토 및 선생님께 전송</span>
-      </button>
+    <!-- PALACE MAP MODAL -->
+    <div id="mapModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-4 flex flex-col max-h-[85vh] shadow-2xl">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-xs font-bold text-slate-800"><i class="fa-solid fa-map text-amber-600 mr-1"></i> 덕수궁 탐구 건물 배치도</h3>
+          <button onclick="closePalaceMapModal()" class="text-slate-400 hover:text-slate-700 text-sm p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="border rounded-xl overflow-hidden bg-slate-100 flex-1 relative flex items-center justify-center p-2">
+          <svg viewBox="0 0 400 450" class="w-full h-auto max-h-[380px]">
+            <rect x="20" y="20" width="360" height="400" rx="15" fill="#fdfbf7" stroke="#78350f" stroke-width="3" stroke-dasharray="6 3"/>
+            <rect x="330" y="320" width="40" height="60" rx="4" fill="#991b1b"/>
+            <text x="350" y="355" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">대한문</text>
+            <text x="350" y="395" fill="#991b1b" font-size="10" font-weight="bold" text-anchor="middle">[1,2번]</text>
 
-    </div>
+            <rect x="150" y="220" width="90" height="80" rx="6" fill="#1e3a8a"/>
+            <text x="195" y="255" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">중화전</text>
+            <text x="195" y="275" fill="#93c5fd" font-size="10" text-anchor="middle">[7,8,9번]</text>
 
-  </main>
+            <rect x="250" y="160" width="70" height="50" rx="4" fill="#854d0e"/>
+            <text x="285" y="190" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">석어당</text>
+            <text x="285" y="203" fill="#fde68a" font-size="9" text-anchor="middle">[7번]</text>
 
-  <!-- 최종 결과 보고서 모달 -->
-  <div id="reportModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <h3 class="font-bold text-sm text-slate-800" id="reportHeaderTitle">탐구 보고서</h3>
-        <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-1">✕</button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3 text-xs" id="reportContent"></div>
-      <div class="p-3 border-t border-slate-200 bg-slate-50 flex space-x-2">
-        <button onclick="copyToClipboard()" class="flex-1 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 shadow">
-          텍스트 복사 (카톡·패들렛 제출)
-        </button>
-        <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">
+            <rect x="240" y="230" width="75" height="55" rx="4" fill="#047857"/>
+            <text x="277" y="255" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">함녕·덕홍전</text>
+            <text x="277" y="270" fill="#a7f3d0" font-size="9" text-anchor="middle">[5번]</text>
+
+            <rect x="235" y="70" width="80" height="60" rx="6" fill="#065f46"/>
+            <text x="275" y="100" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">정관헌</text>
+            <text x="275" y="118" fill="#6ee7b7" font-size="9" text-anchor="middle">[3,4,5번]</text>
+
+            <rect x="50" y="110" width="85" height="70" rx="6" fill="#475569"/>
+            <text x="92" y="145" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">석조전</text>
+            <text x="92" y="162" fill="#cbd5e1" font-size="9" text-anchor="middle">[5,9번]</text>
+
+            <circle cx="92" cy="220" r="22" fill="#d97706"/>
+            <text x="92" y="224" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">해시계</text>
+            <text x="92" y="255" fill="#b45309" font-size="10" font-weight="bold" text-anchor="middle">[10번]</text>
+
+            <path d="M 330 350 L 280 290 L 275 140 L 92 195" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4"/>
+          </svg>
+        </div>
+        <p class="text-[10px] text-slate-500 text-center mt-2">
+          대한문 진입 ➔ 정관헌 ➔ 석어당·중화전 ➔ 미술관 앞 해시계 순으로 이동하면 효율적입니다.
+        </p>
+        <button onclick="closePalaceMapModal()" class="w-full mt-2 py-2 bg-palace-navy text-white text-xs font-bold rounded-xl">
           닫기
         </button>
       </div>
     </div>
+
+    <!-- Alert / Toast Modal -->
+    <div id="feedbackModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl text-center transform scale-95 transition-all">
+        <div id="modalIcon" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl mb-2"></div>
+        <h4 id="modalTitle" class="text-sm font-bold text-slate-800 mb-1"></h4>
+        <p id="modalMsg" class="text-xs text-slate-600 whitespace-pre-line mb-4"></p>
+        <button onclick="closeFeedbackModal()" class="w-full py-2 bg-palace-navy text-white text-xs font-bold rounded-xl active:scale-95">
+          확인
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    const SLIDES_DATA = [
-      {
-        num: 1,
-        title: "[1번]",
-        img: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800&auto=format&fit=crop&q=80",
-        desc: "【H】 덕수궁에 들어가려면 정문인 '대한문'을 지나야 합니다. 대한문에는 문이 3개가 있다. 이는 신분에 따라 출입을 달리 하기 위해서입니다. 다음 문은 누가 드나들던 문일까요?",
-        render: () => `
-          <div class="grid grid-cols-3 gap-2">
-            <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
-              <span class="block text-xs font-bold mb-1 text-slate-700">왼쪽 문</span>
-              <select id="ans_1_l" class="w-full text-xs p-1.5 border rounded-lg bg-white">
-                <option value="">선택</option>
-                <option value="왕(황제)">왕(황제)</option>
-                <option value="문관(동반)">문관(동반)</option>
-                <option value="무관(서반)">무관(서반)</option>
-              </select>
-            </div>
-            <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
-              <span class="block text-xs font-bold mb-1 text-slate-700">중간 문</span>
-              <select id="ans_1_m" class="w-full text-xs p-1.5 border rounded-lg bg-white">
-                <option value="">선택</option>
-                <option value="왕(황제)">왕(황제)</option>
-                <option value="문관(동반)">문관(동반)</option>
-                <option value="무관(서반)">무관(서반)</option>
-              </select>
-            </div>
-            <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
-              <span class="block text-xs font-bold mb-1 text-slate-700">오른쪽 문</span>
-              <select id="ans_1_r" class="w-full text-xs p-1.5 border rounded-lg bg-white">
-                <option value="">선택</option>
-                <option value="왕(황제)">왕(황제)</option>
-                <option value="문관(동반)">문관(동반)</option>
-                <option value="무관(서반)">무관(서반)</option>
-              </select>
-            </div>
-          </div>
-          <p class="text-[11px] text-slate-400 text-center">💡 팁: 왕이 궁궐 안에서 남쪽을 바라보는 시선 기준</p>
-        `
-      },
-      {
-        num: 2,
-        title: "[2번]",
-        img: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 문의 폭의 비는 얼마일까요?\n\n• 폭의 비를 측정한 방법을 동영상으로 찍어서 보내주세요.\n• 문의 폭의 비는 얼마인가요?",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">문의 폭의 비 (왼쪽 : 중간 : 오른쪽)</label>
-              <div class="flex items-center space-x-1">
-                <input type="text" id="ans_2_l" placeholder="왼쪽" class="w-1/3 text-center text-xs p-2 border rounded-lg">
-                <span>:</span>
-                <input type="text" id="ans_2_m" placeholder="중간" class="w-1/3 text-center text-xs p-2 border rounded-lg">
-                <span>:</span>
-                <input type="text" id="ans_2_r" placeholder="오른쪽" class="w-1/3 text-center text-xs p-2 border rounded-lg">
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">폭의 비를 측정한 방법 설명</label>
-              <input type="text" id="ans_2_how" placeholder="예: 신발 길이, 보폭 등으로 측정" class="w-full text-xs p-2 border rounded-lg">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">측정 사진/동영상 첨부</label>
-              <input type="file" accept="image/*,video/*" capture="environment" id="ans_2_file" class="text-xs w-full text-slate-500">
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 3,
-        title: "[3번]",
-        img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80",
-        desc: "【H】 함녕전 뒤뜰의 북쪽 방향에 있는 초록색 지붕의 건물로 러시아의 건축가 사바틴이 1900년에 지은 것으로 고종이 세자인 순종과 함께 음악을 듣고 커피를 마신 곳입니다. 이곳을 찾아 모둠끼리 인증샷을 찍어 보내고 이 건물의 이름을 적어 보내주세요.",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">이 건물의 이름은?</label>
-              <input type="text" id="ans_3_name" placeholder="전각 이름을 입력하세요" class="w-full text-xs p-2.5 border rounded-lg font-bold">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">모둠 현장 인증샷</label>
-              <input type="file" accept="image/*" capture="environment" id="ans_3_photo" class="text-xs w-full text-slate-500">
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 4,
-        title: "[4번]",
-        img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 기둥과 철제 난간, 단청의 그림을 잘 관찰하여 봅시다. 여기에는 꽃, 사슴, 박쥐, 소나무 등이 장식되어 있는데 위 그림과 같은 두 기둥 사이에 장식되어 있는 박쥐가 보이나요?\n\n1. 박쥐의 위치를 사진에서 표시해서 이미지로 보내주세요.\n2. 박쥐는 총 몇 마리인가요?",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">두 기둥 사이 박쥐의 총 마리 수는?</label>
-              <div class="flex items-center space-x-2">
-                <input type="number" id="ans_4_count" placeholder="0" class="w-24 text-center text-xs p-2 border rounded-lg font-bold">
-                <span class="text-xs font-bold text-slate-600">마리</span>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">박쥐를 찾은 난간 사진 첨부</label>
-              <input type="file" accept="image/*" capture="environment" id="ans_4_photo" class="text-xs w-full text-slate-500">
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 5,
-        title: "[5번]",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Korean_Empire_Emblem.svg/640px-Korean_Empire_Emblem.svg.png",
-        desc: "【H】 대한제국의 국장으로 일제는 대한제국을 자주 국가가 아니라 천황의 지배를 받는 한 가문으로 낮추기 위해 이 문양을 궁궐 곳곳에 새겨 놓았다고 합니다. 이 문양의 이름은 오얏꽃이라고 합니다.\n\n1. 정관헌, 석조전, 덕홍전의 오얏꽃 문양을 찾아 사진을 찍어 보내 주세요.\n2. 덕홍전 오얏꽃의 색깔은?",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">2. 덕홍전 오얏꽃의 색깔은?</label>
-              <input type="text" id="ans_5_color" placeholder="예: 황금색, 노란색 등" class="w-full text-xs p-2 border rounded-lg">
-            </div>
-            <div class="space-y-2">
-              <label class="block text-xs font-bold text-slate-700">1. 세 전각의 오얏꽃 문양 사진 첨부</label>
-              <div class="space-y-1 text-xs text-slate-600">
-                <div>• 정관헌: <input type="file" accept="image/*" id="ans_5_f1" class="text-xs w-full"></div>
-                <div>• 석조전: <input type="file" accept="image/*" id="ans_5_f2" class="text-xs w-full"></div>
-                <div>• 덕홍전: <input type="file" accept="image/*" id="ans_5_f3" class="text-xs w-full"></div>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 6,
-        title: "[6번]",
-        img: "https://images.unsplash.com/photo-1548115184-bc6544d06a58?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 한옥에서 칸이란 기둥과 기둥사이의 공간입니다. 기둥이 다섯 개있으면 네 칸이고, 두 개 있으면 한 칸입니다. 사진 속 공간의 크기는 4칸 × 1칸 = 4칸입니다.\n\n1. 보잘 것 없는 작은 집을 초가삼간(草家三間)이라고 하는데 초가삼간은 몇 칸일까요?\n2. 조선시대에는 왕 이외의 사람은 몇 칸을 넘는 집에서 살 수 없게 했답니다. 몇 칸일까요?",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">1. 초가삼간은 몇 칸일까요?</label>
-              <div class="flex items-center space-x-2">
-                <input type="number" id="ans_6_q1" placeholder="칸" class="w-24 text-center text-xs p-2 border rounded-lg font-bold">
-                <span class="text-xs font-bold">칸</span>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">2. 조선시대 일반인이 살 수 있는 최대 칸 수는?</label>
-              <div class="flex items-center space-x-2">
-                <input type="number" id="ans_6_q2" placeholder="칸" class="w-24 text-center text-xs p-2 border rounded-lg font-bold">
-                <span class="text-xs font-bold">칸을 넘을 수 없음</span>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 7,
-        title: "[7번]",
-        img: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 한옥에서 칸이란 기둥과 기둥사이의 공간입니다. 기둥이 다섯 개있으면 네 칸이고, 두 개 있으면 한 칸입니다. 사진 속 공간의 크기는 4칸 × 1칸 = 4칸입니다.\n\n3. 중화전과 석어당은 몇 칸일까요?\n4. 조선시대 건축법에 따르면 중화전과 석어당 중 누가 더 넓을까요?",
-        render: () => `
-          <div class="space-y-3">
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="block text-xs font-bold text-slate-800">• 중화전 (정면 × 측면)</span>
-              <div class="flex items-center space-x-1 text-xs">
-                <input type="number" id="ans_7_jhw" placeholder="정면" class="w-16 p-1.5 border rounded text-center">
-                <span>칸 ×</span>
-                <input type="number" id="ans_7_jhh" placeholder="측면" class="w-16 p-1.5 border rounded text-center">
-                <span>칸 =</span>
-                <input type="number" id="ans_7_jht" placeholder="총" class="w-16 p-1.5 border rounded text-center font-bold text-teal-700">
-                <span>칸</span>
-              </div>
-            </div>
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="block text-xs font-bold text-slate-800">• 석어당 (정면 × 측면)</span>
-              <div class="flex items-center space-x-1 text-xs">
-                <input type="number" id="ans_7_sew" placeholder="정면" class="w-16 p-1.5 border rounded text-center">
-                <span>칸 ×</span>
-                <input type="number" id="ans_7_seh" placeholder="측면" class="w-16 p-1.5 border rounded text-center">
-                <span>칸 =</span>
-                <input type="number" id="ans_7_set" placeholder="총" class="w-16 p-1.5 border rounded text-center font-bold text-teal-700">
-                <span>칸</span>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">4. 두 건물 중 더 넓은 건물은?</label>
-              <select id="ans_7_bigger" class="w-full text-xs p-2 border rounded-lg font-bold">
-                <option value="">선택하세요</option>
-                <option value="중화전">중화전</option>
-                <option value="석어당">석어당</option>
-              </select>
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 8,
-        title: "[8번]",
-        img: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800&auto=format&fit=crop&q=80",
-        desc: "【H】 중화전은 ○ ○ 궁(덕수궁의 옛 이름)의 정전으로 신하들이 모여 조회를 하던 곳입니다. 고종은 대한제국을 세우며 근대화 의지를 담아 석조전을 지었지만 완공된 해에 국권을 빼앗긴 탓에 정전으로 사용되지 못했습니다. 석조전과 중화전은 대한제국으로 국체를 바꾼 고종의 의지와 시대상이 선명하게 담겨 있는 건축입니다.\n\n1. 덕수궁의 옛 이름은 무엇일까요?\n2. 경운궁의 이름을 덕수궁으로 변경한 이유는 무엇일까요?",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">1. 덕수궁의 옛 이름은?</label>
-              <input type="text" id="ans_8_old" placeholder="궁궐 이름" class="w-full text-xs p-2 border rounded-lg font-bold">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">2. '덕수궁'으로 이름을 변경한 이유</label>
-              <textarea id="ans_8_why" rows="2" placeholder="고종 황제의 장수와 덕을 기리는 의미로..." class="w-full text-xs p-2 border rounded-lg"></textarea>
-            </div>
-          </div>
-        `
-      },
-      {
-        num: 9,
-        title: "[9번]",
-        img: "https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 궁궐의 건물들은 일반적으로 같은 방향으로 짓지만 중화전과 석조전 두 건물은 서로 어긋나게 배치되어 있음을 알 수 있습니다. 중화전과 석조전의 방향이 몇 도 차이 나는지 그림을 보고 짐작해보세요.\n\n💡 [현장 관측 안내]\n석조전 뒤쪽은 공간이 좁고 들어갈 수 없으므로, 시야가 탁 트인 **'중화전 앞마당(조정 박석)'**에 서서 스마트폰 나침반 센서나 각도 슬라이더로 측정해 보세요!",
-        render: () => `
-          <div class="space-y-3">
-            <div class="bg-teal-50 border border-teal-200 p-3 rounded-xl space-y-2">
-              <span class="block text-xs font-bold text-teal-900">🧭 중화전 앞마당 나침반 방위 측정</span>
-              <p class="text-[11px] text-teal-800">품계석 근처에 서서 폰을 각 건물의 정면에 맞추고 기록하세요.</p>
-              <div class="grid grid-cols-2 gap-2">
-                <button type="button" onclick="recordHeading('jh')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
-                  <span>1. 중화전 정면</span>
-                  <span id="jhHeadingText" class="text-teal-600 mt-0.5">미측정</span>
-                </button>
-                <button type="button" onclick="recordHeading('sj')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
-                  <span>2. 석조전 정면</span>
-                  <span id="sjHeadingText" class="text-teal-600 mt-0.5">미측정</span>
-                </button>
-              </div>
-              <div class="text-center font-bold text-xs text-teal-900 pt-1">
-                계산된 축 어긋남 각도: <span id="sensorAngleVal" class="text-teal-700">0</span>°
-              </div>
-            </div>
+    /* -------------------------------------------------------------
+       STATE MANAGEMENT & LOCAL STORAGE
+       ------------------------------------------------------------- */
+    const STORAGE_KEY = 'deoksugung_quest_state_v1';
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">두 건물의 방향이 몇 도 차이 나는지 짐작치 입력:</label>
-              <div class="flex items-center space-x-2">
-                <input type="range" id="ans_9_slider" min="0" max="45" value="15" oninput="document.getElementById('ans_9_deg').value = this.value" class="flex-1 accent-teal-600">
-                <div class="flex items-center">
-                  <input type="number" id="ans_9_deg" value="15" oninput="document.getElementById('ans_9_slider').value = this.value" class="w-16 text-center text-xs p-1.5 border rounded-lg font-bold">
-                  <span class="text-xs font-bold ml-1 text-slate-700">°</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `
+    let questState = {
+      teamName: '',
+      members: '',
+      startDate: '',
+      answers: {
+        1: { solved: false, leftRole: '', centerRole: '', rightRole: '' },
+        2: { solved: false, ratio: '', method: '', mediaData: null },
+        3: { solved: false, buildingName: '', photoData: null },
+        4: { solved: false, markedCanvas: null, batCount: '' },
+        5: { solved: false, jghPhoto: null, sjjPhoto: null, dhjPhoto: null, dhjColor: '' },
+        6: { solved: false, chogaCount: '', kingLimit: '' },
+        7: { solved: false, jwhKan: '', seKan: '', biggerBuilding: '' },
+        8: { solved: false, oldName: '', renameReason: '' },
+        9: { solved: false, guessedAngle: 15, headingJH: null, headingSJ: null },
+        10: { solved: false, howToRead: '', sundialPhoto: null, guessedTime: '' }
+      }
+    };
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          questState = JSON.parse(saved);
+        } catch (e) {
+          console.error('Save parse error', e);
+        }
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(questState));
+      updateGlobalStatus();
+    }
+
+    function resetDataConfirm() {
+      if (window.confirm("지금까지 작성한 모든 현장 기록과 사진을 초기화하시겠습니까?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       MISSION DEFINITIONS (Reflecting exact 10 slides)
+       ------------------------------------------------------------- */
+    const missionMeta = [
+      {
+        id: 1,
+        type: 'H',
+        title: '대한문 3개의 문과 신분별 출입',
+        location: '대한문 앞',
+        desc: '대한문에는 문이 3개 있습니다. 신분에 따라 출입을 달리 하였는데, 각 문은 누가 드나들었을까요?'
       },
       {
-        num: 10,
-        title: "[10번]",
-        img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80",
-        desc: "【M】 지금 현재 시간은 몇 시 일까요? 미술관 앞 해시계를 찾아 시간을 알아보세요.\n\n1. 해시계를 보는 방법은?\n2. 지금 몇 시인지 사진을 찍어서 보내 주세요.",
-        render: () => `
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">1. 해시계(앙부일구)를 보는 방법은?</label>
-              <textarea id="ans_10_how" rows="2" placeholder="영침의 그림자 끝이 가리키는 시각선과 24절기선을..." class="w-full text-xs p-2 border rounded-lg"></textarea>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">2. 해시계로 측정한 현재 시각</label>
-              <input type="text" id="ans_10_time" placeholder="예: 오후 2시 10분경" class="w-full text-xs p-2 border rounded-lg font-bold">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">해시계 현장 사진 첨부</label>
-              <input type="file" accept="image/*" capture="environment" id="ans_10_photo" class="text-xs w-full text-slate-500">
-            </div>
-          </div>
-        `
+        id: 2,
+        type: 'M',
+        title: '대한문 세 문의 폭의 비 측정하기',
+        location: '대한문 기둥 사이',
+        desc: '세 문의 폭의 비는 얼마일까요? 발걸음, 신체, 줄자 등으로 잰 비와 측정 방법을 기록하세요.'
+      },
+      {
+        id: 3,
+        type: 'H',
+        title: '사바틴이 지은 초록 지붕 정관헌 찾기',
+        location: '함녕전 뒤뜰 북쪽',
+        desc: '고종이 순종과 함께 커피를 마시고 음악을 감상하던 서양풍 전각을 찾아 모둠 인증샷을 남기세요.'
+      },
+      {
+        id: 4,
+        type: 'M',
+        title: '정관헌 철제 난간 속 숨은 박쥐 찾기',
+        location: '정관헌 난간',
+        desc: '꽃, 사슴, 소나무 사이에 복을 상징하는 박쥐가 숨어있습니다. 박쥐 위치를 표시하고 총 마리 수를 세어보세요.'
+      },
+      {
+        id: 5,
+        type: 'H',
+        title: '대한제국의 상징 오얏꽃(이화) 문양 탐색',
+        location: '정관헌 / 석조전 / 덕홍전',
+        desc: '전각 곳곳에 새겨진 오얏꽃 문양 사진을 찍고, 덕홍전 오얏꽃의 색깔을 관찰해보세요.'
+      },
+      {
+        id: 6,
+        type: 'M',
+        title: '한옥의 단위 "칸(間)"의 수학적 이해',
+        location: '대한문 옆 행각',
+        desc: '기둥과 기둥 사이를 1칸이라 합니다. "초가삼간"과 조선시대 왕 이외 가옥 칸 수 제한은?'
+      },
+      {
+        id: 7,
+        type: 'M',
+        title: '중화전 vs 석어당 칸 수와 넓이 비교',
+        location: '중화전 및 석어당 앞',
+        desc: '웅장한 중화전과 단청 없는 2층 석어당의 정면/측면 칸 수를 세고 어느 건물이 더 넓은지 비교해보세요.'
+      },
+      {
+        id: 8,
+        type: 'H',
+        title: '중화전과 덕수궁의 원래 이름(역사)',
+        location: '중화전 앞마당',
+        desc: '덕수궁의 원래 이름(경운궁)과 왜 덕수궁으로 이름을 바꾸게 되었는지 역사를 탐구해보세요.'
+      },
+      {
+        id: 9,
+        type: 'M',
+        title: '중화전 앞마당에서 재는 두 건물의 축 각도',
+        location: '중화전 앞마당 (품계석 근처)',
+        desc: '석조전 뒤는 수목으로 측정이 불가합니다! 중화전 앞마당에서 두 건물 정면 방향을 바라보며 축의 어긋난 각도를 재어보세요.'
+      },
+      {
+        id: 10,
+        type: 'M',
+        title: '국립현대미술관 앞 해시계와 현재 시각',
+        location: '미술관 야외 앞',
+        desc: '해시계(앙부일구)의 영침 그림자를 관찰하고 현재 시각을 판독해 인증 사진과 함께 입력하세요.'
       }
     ];
 
-    let currentTeamName = localStorage.getItem('deoksu_active_team') || '';
-    let currentTeamMembers = localStorage.getItem('deoksu_active_members') || '';
-    let currentIdx = 0;
-    let answersStore = JSON.parse(localStorage.getItem('deoksu_answers') || '{}');
-    let currentDeviceHeading = 0;
-    let headingJH = null;
-    let headingSJ = null;
+    /* -------------------------------------------------------------
+       INITIALIZATION & SENSORS
+       ------------------------------------------------------------- */
+    let currentCompassHeading = 0;
 
     window.addEventListener('DOMContentLoaded', () => {
-      initCompass();
-      if (currentTeamName) {
-        document.getElementById('inputTeamNum').value = currentTeamName;
-        document.getElementById('inputMembers').value = currentTeamMembers;
-        startAppView();
+      loadState();
+      initCompassSensor();
+      if (questState.teamName) {
+        document.getElementById('headerTeamText').textContent = questState.teamName;
+        goToScreen('map');
+      } else {
+        goToScreen('intro');
       }
+      updateGlobalStatus();
     });
 
-    function handleStartTour() {
-      const teamNum = document.getElementById('inputTeamNum').value;
-      const members = document.getElementById('inputMembers').value.trim();
-
-      currentTeamName = teamNum;
-      currentTeamMembers = members;
-
-      localStorage.setItem('deoksu_active_team', currentTeamName);
-      localStorage.setItem('deoksu_active_members', currentTeamMembers);
-
-      startAppView();
-    }
-
-    function startAppView() {
-      document.getElementById('loginSection').classList.add('hidden');
-      document.getElementById('missionDeck').classList.remove('hidden');
-      document.getElementById('btnOpenReport').classList.remove('hidden');
-      
-      const badgeText = currentTeamMembers 
-        ? `${currentTeamName} (${currentTeamMembers})` 
-        : `${currentTeamName} 활동 중`;
-      document.getElementById('navTeamInfo').innerText = badgeText;
-
-      renderTabs();
-      showSlide(0);
-    }
-
-    function renderTabs() {
-      const wrapper = document.getElementById('tabsWrapper');
-      wrapper.innerHTML = '';
-      SLIDES_DATA.forEach((s, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `flex-shrink-0 w-8 h-8 rounded-full text-xs font-bold border transition flex items-center justify-center ${
-          i === currentIdx
-            ? 'bg-teal-600 text-white border-teal-600 shadow'
-            : hasAnswer(s.num)
-            ? 'bg-teal-50 text-teal-700 border-teal-300'
-            : 'bg-white text-slate-500 border-slate-300'
-        }`;
-        btn.innerText = s.num;
-        btn.onclick = () => showSlide(i);
-        wrapper.appendChild(btn);
-      });
-    }
-
-    function showSlide(idx) {
-      currentIdx = idx;
-      const s = SLIDES_DATA[idx];
-
-      document.getElementById('viewSlideNum').innerText = s.title;
-      document.getElementById('viewSlideImg').src = s.img;
-      document.getElementById('viewSlideDesc').innerText = s.desc;
-      document.getElementById('viewInteractiveZone').innerHTML = s.render();
-
-      restoreSlideAnswers(s.num);
-      renderTabs();
-    }
-
-    function moveSlide(dir) {
-      saveCurrentData();
-      const next = currentIdx + dir;
-      if (next >= 0 && next < SLIDES_DATA.length) {
-        showSlide(next);
-      }
-    }
-
-    function saveCurrentData() {
-      const s = SLIDES_DATA[currentIdx];
-      if (!answersStore[currentTeamName]) answersStore[currentTeamName] = {};
-
-      const currentAnswers = {};
-      const inputs = document.querySelectorAll('#viewInteractiveZone input, #viewInteractiveZone select, #viewInteractiveZone textarea');
-      inputs.forEach(inp => {
-        if (inp.type === 'file') {
-          if (inp.files && inp.files[0]) currentAnswers[inp.id] = `[사진: ${inp.files[0].name}]`;
-        } else {
-          currentAnswers[inp.id] = inp.value;
-        }
-      });
-
-      answersStore[currentTeamName][s.num] = currentAnswers;
-      localStorage.setItem('deoksu_answers', JSON.stringify(answersStore));
-
-      renderTabs();
-      const toast = document.getElementById('saveToast');
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 1500);
-    }
-
-    function restoreSlideAnswers(num) {
-      if (!answersStore[currentTeamName] || !answersStore[currentTeamName][num]) return;
-      const data = answersStore[currentTeamName][num];
-      for (const [k, v] of Object.entries(data)) {
-        const el = document.getElementById(k);
-        if (el && el.type !== 'file') el.value = v;
-      }
-    }
-
-    function hasAnswer(num) {
-      return Boolean(answersStore[currentTeamName] && answersStore[currentTeamName][num]);
-    }
-
-    // 9번 나침반 방위 측정
-    function initCompass() {
+    function initCompassSensor() {
       if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', (e) => {
-          if (e.webkitCompassHeading) currentDeviceHeading = e.webkitCompassHeading;
-          else if (e.alpha) currentDeviceHeading = 360 - e.alpha;
+          if (e.webkitCompassHeading) {
+            currentCompassHeading = e.webkitCompassHeading;
+          } else if (e.alpha) {
+            currentCompassHeading = 360 - e.alpha;
+          }
         }, true);
       }
     }
 
-    function recordHeading(target) {
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(state => {
-          if (state === 'granted') executeHeading(target);
-          else alert('나침반 권한을 허용해 주세요.');
-        }).catch(() => executeHeading(target));
-      } else {
-        executeHeading(target);
+    function registerTeamAndStart() {
+      const name = document.getElementById('teamInputName').value.trim();
+      const members = document.getElementById('teamInputMembers').value.trim();
+
+      if (!name) {
+        showModal('알림', '모둠 이름을 입력해주세요!', 'fa-circle-exclamation', 'text-amber-500 bg-amber-50');
+        return;
       }
+      questState.teamName = name;
+      questState.members = members || '모둠원 미기재';
+      questState.startDate = new Date().toLocaleDateString('ko-KR');
+      saveState();
+      document.getElementById('headerTeamText').textContent = name;
+      goToScreen('map');
     }
 
-    function executeHeading(target) {
-      const heading = Math.round(currentDeviceHeading % 360);
-      if (target === 'jh') {
-        headingJH = heading;
-        const el = document.getElementById('jhHeadingText');
-        if (el) el.innerText = `${heading}°`;
-      } else if (target === 'sj') {
-        headingSJ = heading;
-        const el = document.getElementById('sjHeadingText');
-        if (el) el.innerText = `${heading}°`;
-      }
-
-      if (headingJH !== null && headingSJ !== null) {
-        let diff = Math.abs(headingJH - headingSJ);
-        if (diff > 180) diff = 360 - diff;
-        const valEl = document.getElementById('sensorAngleVal');
-        if (valEl) valEl.innerText = diff;
-        const degInp = document.getElementById('ans_9_deg');
-        const sliderInp = document.getElementById('ans_9_slider');
-        if (degInp) degInp.value = diff;
-        if (sliderInp) sliderInp.value = diff;
-      }
-    }
-
-    // 결과 보고서
-    function openReportModal() {
-      saveCurrentData();
-      const modal = document.getElementById('reportModal');
-      const body = document.getElementById('reportContent');
-      const data = answersStore[currentTeamName] || {};
-
-      document.getElementById('reportHeaderTitle').innerText = `[${currentTeamName}] 탐구 최종 답안`;
-      let html = `<div class="p-2.5 bg-slate-100 rounded-xl mb-2">
-        <p class="font-bold text-slate-800">${currentTeamName} 탐구 보고서</p>
-        <p class="text-[11px] text-slate-500">조원: ${currentTeamMembers || '미기재'}</p>
-      </div>`;
-
-      SLIDES_DATA.forEach(s => {
-        const ans = data[s.num] || {};
-        const entries = Object.entries(ans);
-        html += `<div class="p-2.5 border rounded-lg bg-white space-y-1">
-          <div class="font-bold text-teal-800">${s.title}</div>`;
-        if (entries.length === 0) {
-          html += `<div class="text-slate-400 italic">미입력</div>`;
-        } else {
-          entries.forEach(([k, v]) => {
-            html += `<div class="text-slate-700 pl-1">• ${k.replace('ans_', '')}: <strong>${v || '미입력'}</strong></div>`;
-          });
+    function updateGlobalStatus() {
+      let solvedCount = 0;
+      for (let i = 1; i <= 10; i++) {
+        if (questState.answers[i] && questState.answers[i].solved) {
+          solvedCount++;
         }
-        html += `</div>`;
+      }
+      document.getElementById('headerProgress').textContent = `${solvedCount} / 10`;
+      const pct = (solvedCount / 10) * 100;
+      document.getElementById('globalProgressBar').style.width = pct + '%';
+
+      renderMissionCards();
+
+      const finishWrap = document.getElementById('finishReportBtnWrap');
+      if (solvedCount === 10) {
+        finishWrap.classList.remove('hidden');
+      } else {
+        finishWrap.classList.add('hidden');
+      }
+    }
+
+    function goToScreen(screenName) {
+      document.getElementById('screenIntro').classList.add('hidden');
+      document.getElementById('screenMap').classList.add('hidden');
+      document.getElementById('screenMission').classList.add('hidden');
+      document.getElementById('screenReport').classList.add('hidden');
+
+      if (screenName === 'intro') {
+        document.getElementById('screenIntro').classList.remove('hidden');
+      } else if (screenName === 'map') {
+        renderMissionCards();
+        document.getElementById('screenMap').classList.remove('hidden');
+      } else if (screenName === 'mission') {
+        document.getElementById('screenMission').classList.remove('hidden');
+      } else if (screenName === 'report') {
+        renderReport();
+        document.getElementById('screenReport').classList.remove('hidden');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       RENDER MISSION LIST CARDS
+       ------------------------------------------------------------- */
+    function renderMissionCards() {
+      const container = document.getElementById('missionCardContainer');
+      container.innerHTML = '';
+
+      missionMeta.forEach(m => {
+        const isSolved = questState.answers[m.id] && questState.answers[m.id].solved;
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl bg-white border transition shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.99] ${
+          isSolved ? 'border-emerald-300 bg-emerald-50/40' : 'border-slate-200 hover:border-amber-400'
+        }`;
+        card.onclick = () => openMission(m.id);
+
+        card.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 ${
+              m.type === 'H' ? 'bg-red-100 text-red-700' : 'bg-teal-100 text-teal-700'
+            }">
+              [${m.type}] ${m.id}번
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-slate-400 font-semibold"><i class="fa-solid fa-map-pin mr-0.5"></i>${m.location}</span>
+                ${isSolved ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">해결 완료</span>' : ''}
+              </div>
+              <h5 class="text-xs font-bold text-slate-800 leading-snug">${m.title}</h5>
+            </div>
+          </div>
+          <div class="text-slate-400 text-xs pl-2">
+            ${isSolved ? '<i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>' : '<i class="fa-solid fa-chevron-right"></i>'}
+          </div>
+        `;
+        container.appendChild(card);
       });
+    }
+
+    /* -------------------------------------------------------------
+       MISSION RUNNER BUILDER (SLIDES 1 - 10)
+       ------------------------------------------------------------- */
+    function openMission(id) {
+      const body = document.getElementById('missionDetailBody');
+      const meta = missionMeta.find(m => m.id === id);
+      const state = questState.answers[id] || {};
+
+      let html = `
+        <div class="mb-3 flex items-center justify-between">
+          <button onclick="goToScreen('map')" class="text-xs text-slate-600 font-bold flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
+            <i class="fa-solid fa-arrow-left"></i> 목록으로
+          </button>
+          <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${meta.type === 'H' ? 'bg-red-100 text-red-700' : 'bg-teal-100 text-teal-700'}">
+            [${meta.type === 'H' ? '역사 탐구' : '수학 탐구'}] ${meta.id}번 미션
+          </span>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4">
+          <div>
+            <div class="flex items-center gap-1.5 text-amber-600 text-[11px] font-semibold mb-0.5">
+              <i class="fa-solid fa-compass"></i> ${meta.location}
+            </div>
+            <h3 class="text-base font-black text-slate-900">${meta.title}</h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">${meta.desc}</p>
+          </div>
+      `;
+
+      if (id === 1) {
+        // [1번] 대한문 세 문의 역할
+        html += `
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 leading-normal">
+            💡 <b>조선 궁궐의 삼문(三門) 예법:</b><br>
+            가운데 문은 누구의 문일까요? 동쪽(오른쪽)과 서쪽(왼쪽)은 문관과 무관 중 누가 다녔을까요? 현장에서 안내판이나 삼문의 너비를 관찰해보고 선택하세요.
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">① 왼쪽 문(서쪽)은 누가 다녔을까요?</label>
+              <select id="m1_left" class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">
+                <option value="">선택하세요</option>
+                <option value="왕" ${state.leftRole === '왕' ? 'selected' : ''}>왕 (임금)</option>
+                <option value="문관" ${state.leftRole === '문관' ? 'selected' : ''}>문관 (문신 관료)</option>
+                <option value="무관" ${state.leftRole === '무관' ? 'selected' : ''}>무관 (무신 군관)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">② 중간 문(중앙)은 누가 다녔을까요?</label>
+              <select id="m1_center" class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">
+                <option value="">선택하세요</option>
+                <option value="왕" ${state.centerRole === '왕' ? 'selected' : ''}>왕 (임금 전용 어문)</option>
+                <option value="문관" ${state.centerRole === '문관' ? 'selected' : ''}>문관 (문신 관료)</option>
+                <option value="무관" ${state.centerRole === '무관' ? 'selected' : ''}>무관 (무신 군관)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">③ 오른쪽 문(동쪽)은 누가 다녔을까요?</label>
+              <select id="m1_right" class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">
+                <option value="">선택하세요</option>
+                <option value="왕" ${state.rightRole === '왕' ? 'selected' : ''}>왕 (임금)</option>
+                <option value="문관" ${state.rightRole === '문관' ? 'selected' : ''}>문관 (문신 관료 / 동반)</option>
+                <option value="무관" ${state.rightRole === '무관' ? 'selected' : ''}>무관 (무신 군관 / 서반)</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else if (id === 2) {
+        // [2번] 문의 폭의 비 측정
+        html += `
+          <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs text-teal-900 leading-normal">
+            📏 <b>현장 실측 미션:</b><br>
+            자신의 발걸음(보폭), 신발 길이, 또는 줄자를 이용해 <b>왼쪽 문 : 가운데 문 : 오른쪽 문</b>의 너비 비율을 직접 측정해보세요!
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 문의 폭의 비는 얼마인가요?</label>
+              <input type="text" id="m2_ratio" placeholder="예: 3 : 4 : 3 또는 1 : 1.3 : 1" value="${state.ratio || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. 폭의 비를 측정한 방법 (구체적 서술)</label>
+              <textarea id="m2_method" rows="2" placeholder="예: 모둠원 신발 길이로 왼쪽 문 12걸음, 가운데 문 16걸음, 오른쪽 문 12걸음으로 측정했습니다."
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">${state.method || ''}</textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">3. 측정 모습 사진/동영상 첨부</label>
+              <input type="file" id="m2_file" accept="image/*,video/*" capture="environment" class="text-xs w-full mb-1" onchange="handleFileUpload(event, 'm2_preview', 2, 'mediaData')" />
+              <div id="m2_preview" class="w-full h-36 bg-slate-100 rounded-xl overflow-hidden border flex items-center justify-center text-slate-400 text-xs">
+                ${state.mediaData ? `<img src="${state.mediaData}" class="w-full h-full object-cover"/>` : '현장 측정 사진 또는 캡처 화면'}
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (id === 3) {
+        // [3번] 함녕전 뒤뜰 북쪽 정관헌 찾기
+        html += `
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
+            ☕ <b>사바틴의 서양풍 정자:</b><br>
+            1900년 러시아 건축가 사바틴이 지었으며, 고종 황제가 세자(순종)와 함께 커피를 마시고 음악을 감상하던 건물입니다.
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 모둠 단체 현장 인증샷 찍기</label>
+              <input type="file" id="m3_file" accept="image/*" capture="environment" class="text-xs w-full mb-1" onchange="handleFileUpload(event, 'm3_preview', 3, 'photoData')" />
+              <div id="m3_preview" class="w-full h-40 bg-slate-100 rounded-xl overflow-hidden border flex items-center justify-center text-slate-400 text-xs">
+                ${state.photoData ? `<img src="${state.photoData}" class="w-full h-full object-cover"/>` : '건물 배경 모둠 단체 사진을 업로드하세요'}
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. 이 건물의 이름은 무엇일까요?</label>
+              <input type="text" id="m3_name" placeholder="세 글자 건물 이름 입력" value="${state.buildingName || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+          </div>
+        `;
+      } else if (id === 4) {
+        // [4번] 정관헌 철제 난간 박쥐 문양 찾기
+        html += `
+          <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs text-teal-900">
+            🦇 <b>전통 문양 속 박쥐(편복, 蝙蝠):</b><br>
+            박쥐의 한자 발음 '복(蝠)'이 행복의 '복(福)'과 같아 오복을 상징합니다. 난간 속 두 기둥 사이 장식된 박쥐를 직접 터치해 찾아보세요!
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 아래 난간 사진을 터치하여 박쥐 위치에 동그라미 표시하기</label>
+              <div class="relative border-2 border-amber-300 rounded-xl overflow-hidden">
+                <canvas id="batCanvas" width="340" height="180" class="w-full h-44 bg-slate-800 cursor-crosshair block"></canvas>
+                <div class="absolute bottom-2 right-2 flex gap-1">
+                  <button onclick="clearBatCanvas()" class="px-2 py-1 bg-black/60 text-white rounded text-[10px]">지우기</button>
+                </div>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-1">* 화면 난간 이미지 위 박쥐를 손가락으로 터치하세요.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. 두 기둥 사이에 장식된 박쥐는 총 몇 마리인가요?</label>
+              <input type="number" id="m4_count" placeholder="예: 2" value="${state.batCount || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+          </div>
+        `;
+      } else if (id === 5) {
+        // [5번] 오얏꽃 문양 찾기
+        html += `
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
+            🌸 <b>대한제국 황실 국장(오얏꽃):</b><br>
+            정관헌, 석조전, 덕홍전에 새겨진 황실의 상징 오얏꽃(자두꽃) 문양을 각각 현장에서 찾아 사진을 등록하세요.
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+            <div>
+              <p class="text-[10px] font-bold text-slate-700 mb-1">① 정관헌</p>
+              <input type="file" accept="image/*" capture="environment" class="hidden" id="f_jgh" onchange="handleFileUpload(event, 'p_jgh', 5, 'jghPhoto')">
+              <label for="f_jgh" class="block w-full h-20 bg-slate-100 border border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer overflow-hidden" id="p_jgh">
+                ${state.jghPhoto ? `<img src="${state.jghPhoto}" class="w-full h-full object-cover"/>` : '<i class="fa-solid fa-camera text-slate-400"></i><span class="text-[9px] text-slate-400">촬영</span>'}
+              </label>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-700 mb-1">② 석조전</p>
+              <input type="file" accept="image/*" capture="environment" class="hidden" id="f_sjj" onchange="handleFileUpload(event, 'p_sjj', 5, 'sjjPhoto')">
+              <label for="f_sjj" class="block w-full h-20 bg-slate-100 border border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer overflow-hidden" id="p_sjj">
+                ${state.sjjPhoto ? `<img src="${state.sjjPhoto}" class="w-full h-full object-cover"/>` : '<i class="fa-solid fa-camera text-slate-400"></i><span class="text-[9px] text-slate-400">촬영</span>'}
+              </label>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-700 mb-1">③ 덕홍전</p>
+              <input type="file" accept="image/*" capture="environment" class="hidden" id="f_dhj" onchange="handleFileUpload(event, 'p_dhj', 5, 'dhjPhoto')">
+              <label for="f_dhj" class="block w-full h-20 bg-slate-100 border border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer overflow-hidden" id="p_dhj">
+                ${state.dhjPhoto ? `<img src="${state.dhjPhoto}" class="w-full h-full object-cover"/>` : '<i class="fa-solid fa-camera text-slate-400"></i><span class="text-[9px] text-slate-400">촬영</span>'}
+              </label>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <label class="block text-xs font-bold text-slate-700 mb-1">덕홍전 내부 천장에 장식된 오얏꽃의 색깔은?</label>
+            <input type="text" id="m5_color" placeholder="예: 황금색(노란색) 등 현장에서 본 색상 입력" value="${state.dhjColor || ''}"
+              class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+          </div>
+        `;
+      } else if (id === 6) {
+        // [6번] 행각 4칸x1칸과 칸의 개념
+        html += `
+          <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs text-teal-900">
+            📐 <b>한옥의 공간 단위 '칸(間)':</b><br>
+            기둥과 기둥 사이의 공간을 1칸이라 부릅니다. 기둥이 5개면 4칸, 기둥이 2개면 1칸이 됩니다.
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 보잘것없는 작은 집을 '초가삼간(草家三間)'이라고 합니다. 초가삼간은 몇 칸일까요?</label>
+              <input type="number" id="m6_choga" placeholder="숫자만 입력 (예: 3)" value="${state.chogaCount || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. 조선시대 법률(경국대전)상 왕 이외의 사람은 몇 칸을 넘는 집에서 살 수 없었을까요?</label>
+              <input type="number" id="m6_limit" placeholder="숫자만 입력 (예: 99)" value="${state.kingLimit || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+          </div>
+        `;
+      } else if (id === 7) {
+        // [7번] 중화전 vs 석어당 칸 수 비교
+        html += `
+          <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs text-teal-900">
+            🏛️ <b>궁궐 전각의 규모 세기:</b><br>
+            중화전과 석어당 앞에 서서 앞면(정면)과 옆면(측면)의 기둥 사이 칸 수를 직접 세어보세요!
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">중화전 정면×측면 칸 수</label>
+                <input type="text" id="m7_jwh" placeholder="예: 5칸 × 4칸 (20칸)" value="${state.jwhKan || ''}"
+                  class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">석어당 1층 칸 수</label>
+                <input type="text" id="m7_se" placeholder="예: 8칸 × 3칸" value="${state.seKan || ''}"
+                  class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">조선시대 궁궐 건축법과 칸당 면적을 고려할 때, 두 건물 중 더 넓은 건물은?</label>
+              <div class="flex gap-2">
+                <label class="flex-1 text-center py-2 border rounded-xl cursor-pointer text-xs font-bold ${state.biggerBuilding === '중화전' ? 'bg-palace-navy text-white' : 'bg-slate-50'}">
+                  <input type="radio" name="bigger" value="중화전" class="hidden" onchange="setRadioVal('m7_bigger', '중화전')"> 중화전
+                </label>
+                <label class="flex-1 text-center py-2 border rounded-xl cursor-pointer text-xs font-bold ${state.biggerBuilding === '석어당' ? 'bg-palace-navy text-white' : 'bg-slate-50'}">
+                  <input type="radio" name="bigger" value="석어당" class="hidden" onchange="setRadioVal('m7_bigger', '석어당')"> 석어당
+                </label>
+              </div>
+              <input type="hidden" id="m7_bigger" value="${state.biggerBuilding || ''}" />
+            </div>
+          </div>
+        `;
+      } else if (id === 8) {
+        // [8번] 중화전과 경운궁의 역사
+        html += `
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
+            📜 <b>중화전 앞마당 품계석과 역사:</b><br>
+            중화전은 덕수궁의 정전입니다. 고종 황제는 대한제국을 선포하고 이곳을 황궁으로 삼았습니다.
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 덕수궁의 옛 이름은 무엇일까요? (ㅇ ㅇ 궁)</label>
+              <input type="text" id="m8_old" placeholder="세 글자 입력 (예: 경운궁)" value="${state.oldName || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. '경운궁'을 '덕수궁'으로 변경한 역사적 이유는?</label>
+              <textarea id="m8_reason" rows="2" placeholder="예: 고종이 순종에게 양위한 후, 고종 황제의 장수(덕을 누리며 오래 살라)를 기원하는 뜻으로 순종이 덕수(德壽)라는 궁호를 올렸습니다."
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">${state.renameReason || ''}</textarea>
+            </div>
+          </div>
+        `;
+      } else if (id === 9) {
+        // [수정된 9번] 중화전 앞마당(조정 박석 마당) 현장 측정
+        html += `
+          <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed">
+            🚩 <b>현장 안전 & 관측 장소 안내:</b><br>
+            석조전 뒤쪽은 수목이 우거져 있고 관람이 제한되어 측정이 불가능합니다.<br>
+            시야가 탁 트인 <b>[중화전 앞마당 품계석 부근]</b>에 서서 두 건물의 정면 축을 바라보며 측정하세요!
+          </div>
+
+          <!-- 스마트폰 나침반 센서 현장 측정 블록 -->
+          <div class="bg-teal-50 border border-teal-200 p-3 rounded-xl text-xs space-y-2">
+            <div class="flex items-center justify-between text-teal-900 font-bold">
+              <span><i class="fa-solid fa-compass mr-1"></i> 스마트폰 나침반 현장 측정</span>
+              <span class="text-[10px] text-teal-600 font-normal">앞마당에서 직접 터치</span>
+            </div>
+            <p class="text-[11px] text-slate-600">
+              중화전 앞마당에 서서 폰을 정면으로 비추며 순서대로 버튼을 눌러보세요.
+            </p>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" onclick="recordPalaceHeading('jh')" class="p-2.5 bg-white border border-teal-300 rounded-xl text-center active:bg-teal-100 shadow-sm">
+                <span class="block text-[11px] font-bold text-slate-700">1. 중화전 정면</span>
+                <span id="jhHeadingBadge" class="text-xs font-extrabold text-teal-700 mt-0.5 block">${state.headingJH ? state.headingJH + '°' : '터치하여 측정'}</span>
+              </button>
+              <button type="button" onclick="recordPalaceHeading('sj')" class="p-2.5 bg-white border border-teal-300 rounded-xl text-center active:bg-teal-100 shadow-sm">
+                <span class="block text-[11px] font-bold text-slate-700">2. 석조전 정면</span>
+                <span id="sjHeadingBadge" class="text-xs font-extrabold text-teal-700 mt-0.5 block">${state.headingSJ ? state.headingSJ + '°' : '터치하여 측정'}</span>
+              </button>
+            </div>
+            <div class="text-center font-bold text-xs text-teal-900 pt-1">
+              센서로 계산된 축 차이: <span id="sensorDiffDisplay" class="text-amber-600 text-sm font-black">${state.guessedAngle || 15}</span>°
+            </div>
+          </div>
+
+          <!-- 시각적 각도 다이얼 & 슬라이더 조절 -->
+          <div class="space-y-3 pt-2 text-center">
+            <div class="relative w-44 h-44 mx-auto border-2 border-slate-300 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shadow-inner">
+              <div class="absolute inset-2 border border-dashed border-slate-400 rounded-full"></div>
+              <!-- 중화전 정면 축 (기준 0도) -->
+              <div class="absolute w-0.5 h-full bg-blue-600"></div>
+              <span class="absolute top-1 text-[9px] font-bold text-blue-700">중화전 정면 축</span>
+              <!-- 석조전 정면 축 (회전선) -->
+              <div id="rotatedAxis" class="absolute w-0.5 h-full bg-amber-600 transition-transform origin-center" style="transform: rotate(${state.guessedAngle || 15}deg);"></div>
+              <span class="absolute bottom-1.5 text-[9px] font-bold text-amber-700">석조전 정면 축</span>
+              <div class="w-4 h-4 bg-palace-navy rounded-full z-10"></div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">
+                최종 짐작 및 측정한 각도 차이: <span id="angleDisplay" class="text-amber-600 text-sm font-extrabold">${state.guessedAngle || 15}°</span>
+              </label>
+              <input type="range" id="m9_angle" min="0" max="45" value="${state.guessedAngle || 15}" 
+                class="w-full accent-amber-600 cursor-pointer" oninput="updateAngleSlider(this.value)" />
+              <div class="flex justify-between text-[10px] text-slate-400 px-1">
+                <span>0° (나란함)</span>
+                <span>약 15° (정답 부근)</span>
+                <span>45°</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (id === 10) {
+        // [10번] 국립현대미술관 앞 해시계
+        html += `
+          <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-xs text-teal-900">
+            ☀️ <b>앙부일구(해시계) 시각 읽기:</b><br>
+            햇빛에 의해 영침(바늘) 그림자가 가리키는 세로선(시각선)과 가로선(24절기선)을 관찰해보세요.
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">1. 해시계를 보는 방법(원리)은?</label>
+              <textarea id="m10_read" rows="2" placeholder="예: 영침의 뾰족한 그림자 끝이 닿는 세로선으로 시각을 읽고, 가로선으로 계절(절기)을 파악합니다."
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white">${state.howToRead || ''}</textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">2. 지금 현장 해시계 사진 촬영 제출</label>
+              <input type="file" id="m10_file" accept="image/*" capture="environment" class="text-xs w-full mb-1" onchange="handleFileUpload(event, 'm10_preview', 10, 'sundialPhoto')" />
+              <div id="m10_preview" class="w-full h-36 bg-slate-100 rounded-xl overflow-hidden border flex items-center justify-center text-slate-400 text-xs">
+                ${state.sundialPhoto ? `<img src="${state.sundialPhoto}" class="w-full h-full object-cover"/>` : '해시계 그림자 인증샷을 찍어주세요'}
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">3. 해시계로 측정한 현재 시각은 몇 시 몇 분인가요?</label>
+              <input type="text" id="m10_time" placeholder="예: 오시 2각 (오후 12시 30분 경)" value="${state.guessedTime || ''}"
+                class="w-full text-xs p-2.5 rounded-xl border bg-slate-50 focus:bg-white" />
+            </div>
+          </div>
+        `;
+      }
+
+      html += `
+        </div>
+
+        <div class="pt-4 shrink-0">
+          <button onclick="submitMission(${id})" class="w-full py-3 bg-gradient-to-r from-palace-navy to-slate-800 text-yellow-300 font-extrabold text-xs rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>${meta.id}번 미션 해결 완료 및 저장</span>
+          </button>
+        </div>
+      `;
 
       body.innerHTML = html;
-      modal.classList.remove('hidden');
+      goToScreen('mission');
+
+      if (id === 4) {
+        setupBatCanvas(state.markedCanvas);
+      }
     }
 
-    function copyToClipboard() {
-      const data = answersStore[currentTeamName] || {};
-      let txt = `[덕수궁 탐구 결과 - ${currentTeamName}]\n조원: ${currentTeamMembers || '미기재'}\n`;
-      SLIDES_DATA.forEach(s => {
-        txt += `\n${s.title}\n`;
-        const ans = data[s.num] || {};
-        const entries = Object.entries(ans);
-        if (entries.length === 0) txt += `(미입력)\n`;
-        else {
-          entries.forEach(([k, v]) => {
-            txt += `- ${k.replace('ans_', '')}: ${v || '미입력'}\n`;
-          });
+    function setRadioVal(hiddenInputId, val) {
+      document.getElementById(hiddenInputId).value = val;
+      const labels = event.target.closest('.flex').querySelectorAll('label');
+      labels.forEach(l => {
+        l.classList.remove('bg-palace-navy', 'text-white');
+        l.classList.add('bg-slate-50');
+      });
+      event.target.parentElement.classList.remove('bg-slate-50');
+      event.target.parentElement.classList.add('bg-palace-navy', 'text-white');
+    }
+
+    function updateAngleSlider(val) {
+      document.getElementById('angleDisplay').textContent = val + '°';
+      const el = document.getElementById('rotatedAxis');
+      if (el) {
+        el.style.transform = `rotate(${val}deg)`;
+      }
+      const diffEl = document.getElementById('sensorDiffDisplay');
+      if (diffEl) diffEl.textContent = val;
+    }
+
+    /* 9번 문항 나침반 각도 기록 함수 */
+    function recordPalaceHeading(target) {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(state => {
+          if (state === 'granted') executeRecordHeading(target);
+          else alert('스마트폰 나침반 센서 접근 권한을 허용해주세요.');
+        }).catch(() => executeRecordHeading(target));
+      } else {
+        executeRecordHeading(target);
+      }
+    }
+
+    function executeRecordHeading(target) {
+      const heading = Math.round(currentCompassHeading % 360);
+      const m9 = questState.answers[9];
+
+      if (target === 'jh') {
+        m9.headingJH = heading;
+        const b = document.getElementById('jhHeadingBadge');
+        if (b) b.innerText = `${heading}°`;
+      } else if (target === 'sj') {
+        m9.headingSJ = heading;
+        const b = document.getElementById('sjHeadingBadge');
+        if (b) b.innerText = `${heading}°`;
+      }
+
+      if (m9.headingJH !== null && m9.headingSJ !== null) {
+        let diff = Math.abs(m9.headingJH - m9.headingSJ);
+        if (diff > 180) diff = 360 - diff;
+        if (diff > 45) diff = 45; // 슬라이더 최대 범위 보정
+        
+        m9.guessedAngle = diff;
+        const slider = document.getElementById('m9_angle');
+        if (slider) slider.value = diff;
+        updateAngleSlider(diff);
+      }
+      saveState();
+    }
+
+    /* -------------------------------------------------------------
+       SUBMIT & VALIDATE EACH MISSION
+       ------------------------------------------------------------- */
+    function submitMission(id) {
+      const ans = questState.answers[id];
+
+      if (id === 1) {
+        const left = document.getElementById('m1_left').value;
+        const center = document.getElementById('m1_center').value;
+        const right = document.getElementById('m1_right').value;
+
+        if (!left || !center || !right) {
+          showModal('미입력 항목', '세 문의 출입 신분을 모두 선택해주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
         }
+        ans.leftRole = left;
+        ans.centerRole = center;
+        ans.rightRole = right;
+        ans.solved = true;
+      } else if (id === 2) {
+        const ratio = document.getElementById('m2_ratio').value.trim();
+        const method = document.getElementById('m2_method').value.trim();
+        if (!ratio || !method) {
+          showModal('미입력 항목', '문의 폭의 비와 측정 방법을 모두 적어주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.ratio = ratio;
+        ans.method = method;
+        ans.solved = true;
+      } else if (id === 3) {
+        const name = document.getElementById('m3_name').value.trim();
+        if (!name) {
+          showModal('미입력 항목', '건물의 이름을 적어주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.buildingName = name;
+        ans.solved = true;
+      } else if (id === 4) {
+        const count = document.getElementById('m4_count').value.trim();
+        const canvas = document.getElementById('batCanvas');
+        ans.markedCanvas = canvas.toDataURL();
+        ans.batCount = count || '1';
+        ans.solved = true;
+      } else if (id === 5) {
+        const color = document.getElementById('m5_color').value.trim();
+        if (!color) {
+          showModal('미입력 항목', '덕홍전 오얏꽃의 관찰된 색상을 적어주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.dhjColor = color;
+        ans.solved = true;
+      } else if (id === 6) {
+        const choga = document.getElementById('m6_choga').value.trim();
+        const limit = document.getElementById('m6_limit').value.trim();
+        if (!choga || !limit) {
+          showModal('미입력 항목', '두 문제의 답(칸 수)을 모두 입력해주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.chogaCount = choga;
+        ans.kingLimit = limit;
+        ans.solved = true;
+      } else if (id === 7) {
+        const jwh = document.getElementById('m7_jwh').value.trim();
+        const se = document.getElementById('m7_se').value.trim();
+        const bigger = document.getElementById('m7_bigger').value.trim();
+        if (!jwh || !se || !bigger) {
+          showModal('미입력 항목', '칸 수 측정 및 더 넓은 건물을 선택해주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.jwhKan = jwh;
+        ans.seKan = se;
+        ans.biggerBuilding = bigger;
+        ans.solved = true;
+      } else if (id === 8) {
+        const oldName = document.getElementById('m8_old').value.trim();
+        const reason = document.getElementById('m8_reason').value.trim();
+        if (!oldName || !reason) {
+          showModal('미입력 항목', '옛 이름과 변경 이유를 적어주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.oldName = oldName;
+        ans.renameReason = reason;
+        ans.solved = true;
+      } else if (id === 9) {
+        const angle = document.getElementById('m9_angle').value;
+        ans.guessedAngle = angle;
+        ans.solved = true;
+      } else if (id === 10) {
+        const readWay = document.getElementById('m10_read').value.trim();
+        const time = document.getElementById('m10_time').value.trim();
+        if (!readWay || !time) {
+          showModal('미입력 항목', '해시계 보는 방법과 현재 시각을 적어주세요.', 'fa-triangle-exclamation', 'text-amber-500 bg-amber-50');
+          return;
+        }
+        ans.howToRead = readWay;
+        ans.guessedTime = time;
+        ans.solved = true;
+      }
+
+      saveState();
+      showModal('미션 성공!', `${id}번 미션이 정상 저장되었습니다. 다음 탐구 장소로 이동하세요!`, 'fa-circle-check', 'text-emerald-500 bg-emerald-50');
+      goToScreen('map');
+    }
+
+    /* -------------------------------------------------------------
+       CAMERA & FILE UPLOAD HANDLER
+       ------------------------------------------------------------- */
+    function handleFileUpload(event, previewId, missionId, stateKey) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        questState.answers[missionId][stateKey] = dataUrl;
+        const prev = document.getElementById(previewId);
+        if (prev) {
+          prev.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover" />`;
+        }
+        saveState();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* -------------------------------------------------------------
+       BAT CANVAS DRAWING INTERACTION (Mission 4)
+       ------------------------------------------------------------- */
+    let batCtx = null;
+    function setupBatCanvas(existingData) {
+      const canvas = document.getElementById('batCanvas');
+      if (!canvas) return;
+      batCtx = canvas.getContext('2d');
+
+      drawRailingBackground(batCtx, canvas.width, canvas.height);
+
+      if (existingData) {
+        const img = new Image();
+        img.onload = () => batCtx.drawImage(img, 0, 0);
+        img.src = existingData;
+      }
+
+      function handleTouch(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = (clientX - rect.left) * (canvas.width / rect.width);
+        const y = (clientY - rect.top) * (canvas.height / rect.height);
+
+        batCtx.beginPath();
+        batCtx.arc(x, y, 16, 0, Math.PI * 2);
+        batCtx.strokeStyle = '#ef4444';
+        batCtx.lineWidth = 3;
+        batCtx.stroke();
+
+        batCtx.beginPath();
+        batCtx.arc(x, y, 4, 0, Math.PI * 2);
+        batCtx.fillStyle = '#f59e0b';
+        batCtx.fill();
+      }
+
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleTouch(e);
+      }, { passive: false });
+
+      canvas.addEventListener('mousedown', (e) => {
+        handleTouch(e);
+      });
+    }
+
+    function drawRailingBackground(ctx, w, h) {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+
+      ctx.fillStyle = '#b45309';
+      ctx.fillRect(20, 10, 14, h - 20);
+      ctx.fillRect(w - 34, 10, 14, h - 20);
+      ctx.fillRect(w / 2 - 7, 10, 14, h - 20);
+
+      drawBatGlyph(ctx, w * 0.25, h * 0.5);
+      drawBatGlyph(ctx, w * 0.75, h * 0.5);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('정관헌 서양식 철제 난간 패턴 (터치하여 박쥐 표시)', 38, 28);
+    }
+
+    function drawBatGlyph(ctx, cx, cy) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.fillStyle = '#d4af37';
+      ctx.beginPath();
+      ctx.moveTo(0, -6);
+      ctx.bezierCurveTo(15, -25, 30, -10, 24, 8);
+      ctx.bezierCurveTo(15, 2, 5, 12, 0, 4);
+      ctx.bezierCurveTo(-5, 12, -15, 2, -24, 8);
+      ctx.bezierCurveTo(-30, -10, -15, -25, 0, -6);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function clearBatCanvas() {
+      const canvas = document.getElementById('batCanvas');
+      if (!canvas || !batCtx) return;
+      drawRailingBackground(batCtx, canvas.width, canvas.height);
+    }
+
+    /* -------------------------------------------------------------
+       FINAL REPORT GENERATOR
+       ------------------------------------------------------------- */
+    function renderReport() {
+      document.getElementById('repTeam').textContent = questState.teamName;
+      document.getElementById('repMembers').textContent = questState.members;
+      document.getElementById('repDate').textContent = questState.startDate || new Date().toLocaleDateString('ko-KR');
+
+      const container = document.getElementById('reportItemsContainer');
+      container.innerHTML = '';
+
+      missionMeta.forEach(m => {
+        const a = questState.answers[m.id] || {};
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded-xl bg-slate-50 border text-xs leading-normal';
+
+        let detailText = '';
+        if (m.id === 1) {
+          detailText = `왼쪽(무관): <b>${a.leftRole || '-'}</b> | 중앙(왕): <b>${a.centerRole || '-'}</b> | 오른쪽(문관): <b>${a.rightRole || '-'}</b>`;
+        } else if (m.id === 2) {
+          detailText = `문의 비: <b>${a.ratio || '-'}</b><br>측정법: ${a.method || '-'}`;
+        } else if (m.id === 3) {
+          detailText = `건물명: <b>${a.buildingName || '-'}</b> (인증샷 등록됨)`;
+        } else if (m.id === 4) {
+          detailText = `박쥐 마리 수: <b>${a.batCount || '-'}마리</b> (난간 위치 마킹 완료)`;
+        } else if (m.id === 5) {
+          detailText = `덕홍전 오얏꽃 색: <b>${a.dhjColor || '-'}</b> (3곳 문양 촬영됨)`;
+        } else if (m.id === 6) {
+          detailText = `초가삼간: <b>${a.chogaCount || '-'}칸</b> | 왕 이외 가옥 제한: <b>${a.kingLimit || '-'}칸</b>`;
+        } else if (m.id === 7) {
+          detailText = `중화전(${a.jwhKan || '-'}) vs 석어당(${a.seKan || '-'}) | 더 넓은 건물: <b>${a.biggerBuilding || '-'}</b>`;
+        } else if (m.id === 8) {
+          detailText = `옛 이름: <b>${a.oldName || '-'}</b><br>이름 바꾼 이유: ${a.renameReason || '-'}`;
+        } else if (m.id === 9) {
+          detailText = `중화전 앞마당 측정 각도차: <b>약 ${a.guessedAngle || '-'}°</b>`;
+        } else if (m.id === 10) {
+          detailText = `측정 현재 시각: <b>${a.guessedTime || '-'}</b><br>해시계 보는 법: ${a.howToRead || '-'}`;
+        }
+
+        item.innerHTML = `
+          <div class="flex justify-between font-bold text-slate-800 mb-0.5">
+            <span>[${m.type}] ${m.id}번. ${m.title}</span>
+            <span class="${a.solved ? 'text-emerald-600' : 'text-slate-400'}">${a.solved ? '✓ 완료' : '미완료'}</span>
+          </div>
+          <div class="text-slate-600 mt-1">${detailText}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function shareOrCopyReport() {
+      let text = `[덕수궁 역사·수학 융합 탐구 결과 보고서]\n`;
+      text += `모둠: ${questState.teamName}\n`;
+      text += `모둠원: ${questState.members}\n`;
+      text += `탐구일자: ${questState.startDate}\n\n`;
+
+      missionMeta.forEach(m => {
+        const a = questState.answers[m.id] || {};
+        text += `[${m.id}번. ${m.title}]\n`;
+        if (m.id === 1) text += `답: 좌(${a.leftRole})/중(${a.centerRole})/우(${a.rightRole})\n`;
+        else if (m.id === 2) text += `폭의 비: ${a.ratio} (방법: ${a.method})\n`;
+        else if (m.id === 3) text += `건물: ${a.buildingName}\n`;
+        else if (m.id === 4) text += `박쥐 수: ${a.batCount}마리\n`;
+        else if (m.id === 5) text += `덕홍전 오얏꽃 색: ${a.dhjColor}\n`;
+        else if (m.id === 6) text += `초가삼간(${a.chogaCount}칸), 가옥제한(${a.kingLimit}칸)\n`;
+        else if (m.id === 7) text += `중화전(${a.jwhKan}) 석어당(${a.seKan}), 더 넓은 곳: ${a.biggerBuilding}\n`;
+        else if (m.id === 8) text += `옛 이름: ${a.oldName}, 이유: ${a.renameReason}\n`;
+        else if (m.id === 9) text += `축 각도: ${a.guessedAngle}도\n`;
+        else if (m.id === 10) text += `판독 시각: ${a.guessedTime}\n`;
+        text += `\n`;
       });
 
-      navigator.clipboard.writeText(txt).then(() => {
-        alert('보고서 내용이 복사되었습니다! 카톡이나 패들렛에 붙여넣기 하세요.');
-      });
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = text;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      showModal('복사 완료!', '탐구 보고서가 클립보드에 복사되었습니다.\n선생님 카카오톡이나 패들렛에 붙여넣어 제출하세요!', 'fa-clipboard-check', 'text-teal-600 bg-teal-50');
+    }
+
+    /* -------------------------------------------------------------
+       MODAL DIALOGS
+       ------------------------------------------------------------- */
+    function showPalaceMapModal() {
+      document.getElementById('mapModal').classList.remove('hidden');
+    }
+    function closePalaceMapModal() {
+      document.getElementById('mapModal').classList.add('hidden');
+    }
+
+    function showModal(title, msg, iconClass, iconTheme) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMsg').textContent = msg;
+      const iconWrap = document.getElementById('modalIcon');
+      iconWrap.className = `w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl mb-2 ${iconTheme}`;
+      iconWrap.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+      document.getElementById('feedbackModal').classList.remove('hidden');
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').classList.add('hidden');
     }
   </script>
 </body>
