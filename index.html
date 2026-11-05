@@ -3,147 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>덕수궁 수학·역사 융합 현장 미션</title>
-  <!-- Tailwind CSS -->
+  <title>덕수궁 수학·역사 현장 탐구</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- QRCode.js & jsQR for QR scanner -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <style>
     body { -webkit-tap-highlight-color: transparent; }
     .scrollbar-none::-webkit-scrollbar { display: none; }
     .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-    /* 슬라이드 특유의 청록색 곡선 상단 헤더 */
-    .slide-curve-header {
-      background: linear-gradient(180deg, #1898b5 0%, #30b6c6 60%, rgba(255,255,255,0) 100%);
-      border-radius: 0 0 50% 50% / 0 0 25px 25px;
+    .slide-curve {
+      background: linear-gradient(180deg, #1898b5 0%, #38bdf8 65%, #f8fafc 100%);
+      border-radius: 0 0 50% 50% / 0 0 24px 24px;
     }
   </style>
 </head>
-<body class="bg-slate-200 text-slate-800 font-sans antialiased pb-20 select-none">
+<body class="bg-slate-100 text-slate-800 font-sans pb-24">
 
-  <!-- 교사용 / 공통 앱 헤더 바 -->
-  <nav class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-2.5 shadow-sm flex items-center justify-between">
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-2.5 shadow-sm flex items-center justify-between">
     <div class="flex items-center space-x-2">
-      <div class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow">덕</div>
+      <span class="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow">덕</span>
       <div>
         <h1 class="text-xs font-bold text-slate-900 leading-none">덕수궁 매쓰 투어</h1>
-        <span id="navTeamBadge" class="text-[11px] text-teal-700 font-semibold">로그인 필요</span>
+        <span id="navTeamInfo" class="text-[11px] text-teal-700 font-semibold">입장 대기 중</span>
       </div>
     </div>
-    <div class="flex items-center space-x-1.5">
-      <button onclick="openQrScannerModal()" class="px-2.5 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-lg text-xs font-bold flex items-center space-x-1">
-        <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
-        <span>QR로그인</span>
-      </button>
-      <button onclick="toggleTeacherModal(true)" class="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg text-xs" title="교사용 QR 발급">
-        <i data-lucide="settings" class="w-4 h-4"></i>
-      </button>
-    </div>
-  </nav>
+    <button id="btnOpenReport" onclick="openReportModal()" class="hidden px-2.5 py-1 bg-slate-800 text-white rounded-lg text-xs font-bold shadow hover:bg-slate-900">
+      답안 모아보기
+    </button>
+  </header>
 
-  <!-- 메인 프레임 (슬라이드 종횡비 모바일 카드 형태) -->
+  <!-- 메인 컨테이너 -->
   <main class="max-w-md mx-auto p-3 space-y-3">
 
-    <!-- 0. 로그인 섹션 (QR 또는 모둠 선택) -->
-    <section id="loginCard" class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 text-center space-y-5 my-4">
-      <div class="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-teal-600 shadow-inner">
-        <i data-lucide="map-pin" class="w-10 h-10"></i>
+    <!-- 0. 첫 화면: 조 번호 & 조원 이름 입력 카드 -->
+    <section id="loginSection" class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 text-center space-y-4 my-2">
+      <div class="w-16 h-16 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">
+        🏛️
       </div>
       <div>
-        <h2 class="text-xl font-black text-slate-900 tracking-tight">덕수궁 현장 미션</h2>
-        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-          배부받은 모둠 QR코드를 비추거나<br>아래에서 우리 모둠을 선택하여 시작하세요.
-        </p>
+        <h2 class="text-lg font-black text-slate-900">덕수궁 현장 탐구 입장</h2>
+        <p class="text-xs text-slate-500 mt-1">우리 조 번호와 함께하는 조원들의 이름을 적어주세요.</p>
       </div>
 
-      <div class="space-y-3 pt-2">
-        <button onclick="openQrScannerModal()" class="w-full py-3.5 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white rounded-2xl font-bold text-sm shadow flex items-center justify-center space-x-2 transition">
-          <i data-lucide="camera" class="w-4 h-4"></i>
-          <span>모둠 QR 코드 스캔하기</span>
-        </button>
-
-        <div class="flex items-center space-x-2 py-1">
-          <div class="flex-1 border-t border-slate-200"></div>
-          <span class="text-xs text-slate-400">또는</span>
-          <div class="flex-1 border-t border-slate-200"></div>
-        </div>
-
-        <div class="flex space-x-2">
-          <select id="teamSelect" class="flex-1 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 font-bold focus:ring-teal-500 focus:border-teal-500">
-            <option value="">모둠 선택</option>
-            <option value="1모둠">1모둠</option>
-            <option value="2모둠">2모둠</option>
-            <option value="3모둠">3모둠</option>
-            <option value="4모둠">4모둠</option>
-            <option value="5모둠">5모둠</option>
-            <option value="6모둠">6모둠</option>
+      <div class="space-y-3 text-left pt-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">1. 조 번호 선택</label>
+          <select id="inputTeamNum" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 font-bold focus:ring-teal-500 focus:border-teal-500">
+            <option value="1조">1조</option>
+            <option value="2조">2조</option>
+            <option value="3조">3조</option>
+            <option value="4조">4조</option>
+            <option value="5조">5조</option>
+            <option value="6조">6조</option>
+            <option value="7조">7조</option>
+            <option value="8조">8조</option>
           </select>
-          <button onclick="manualLogin()" class="px-5 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold shadow hover:bg-slate-900 active:scale-95 transition">
-            입장
-          </button>
         </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">2. 조원 이름 입력</label>
+          <input type="text" id="inputMembers" placeholder="예: 김민수, 이서연, 박준호" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-2.5 focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+        <button type="button" onclick="handleStartTour()" class="w-full mt-2 py-3.5 bg-teal-600 hover:bg-teal-700 active:scale-98 text-white rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center space-x-1">
+          <span>미션 시작하기 (입장)</span>
+          <span>➔</span>
+        </button>
       </div>
     </section>
 
-    <!-- 1~10번 슬라이드 미션 카드 덱 -->
+    <!-- 1~10번 슬라이드 미션 카드 영역 -->
     <div id="missionDeck" class="hidden space-y-3">
-
-      <!-- 1~10번 슬라이드 이동 탭 버튼 -->
+      
+      <!-- 1~10번 슬라이드 탭 버튼 바 -->
       <div class="flex items-center space-x-1.5 overflow-x-auto py-1 scrollbar-none" id="tabsWrapper"></div>
 
-      <!-- 원본 슬라이드 비주얼 카드 컨테이너 -->
-      <div class="bg-white rounded-3xl shadow-lg border border-slate-300 overflow-hidden relative">
-
-        <!-- 슬라이드 상단 디자인 (청록색 그라디언트 + [O번] 타이틀) -->
-        <div class="slide-curve-header pt-4 pb-6 px-4 text-center relative">
-          <h2 id="slideNumberTitle" class="text-xl font-black text-slate-900 tracking-wider drop-shadow-sm font-mono">[1번]</h2>
+      <!-- 슬라이드 본체 카드 -->
+      <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+        
+        <!-- 슬라이드 상단 곡선 헤더 -->
+        <div class="slide-curve pt-4 pb-6 px-4 text-center">
+          <h2 id="viewSlideNum" class="text-xl font-black text-slate-900 tracking-wider font-mono drop-shadow-sm">[1번]</h2>
         </div>
 
-        <!-- 슬라이드 핵심 사진 이미지 -->
+        <!-- 슬라이드 사진 박스 -->
         <div class="px-4 -mt-2">
-          <div class="relative w-full aspect-[16/10] bg-slate-100 rounded-2xl overflow-hidden shadow-md border border-slate-200 flex items-center justify-center">
-            <img id="slideMainImage" src="" alt="현장 미션 사진" class="w-full h-full object-cover">
+          <div class="w-full aspect-[16/10] bg-slate-200 rounded-2xl overflow-hidden shadow border border-slate-200 flex items-center justify-center">
+            <img id="viewSlideImg" src="" alt="슬라이드 사진" class="w-full h-full object-cover">
           </div>
         </div>
 
-        <!-- 슬라이드 텍스트 지문 -->
+        <!-- 슬라이드 지문 및 미션 구역 -->
         <div class="p-4 space-y-3">
-          <div id="slideQuestionText" class="text-xs sm:text-sm font-medium text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-          </div>
+          <div id="viewSlideDesc" class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50 p-3.5 rounded-2xl border border-slate-100"></div>
 
-          <!-- 미션별 인터랙티브 폼 입력 영역 -->
-          <div id="interactiveZone" class="pt-2 border-t border-slate-100 space-y-3"></div>
+          <!-- 동적 입력 폼 -->
+          <div id="viewInteractiveZone" class="pt-2 border-t border-slate-100 space-y-3"></div>
 
-          <!-- 임시 저장 알림 배너 -->
-          <div id="saveFeedback" class="hidden p-2.5 bg-teal-50 border border-teal-200 text-teal-800 rounded-xl text-xs font-bold text-center">
-            ✓ 답안이 실시간 저장되었습니다.
+          <!-- 저장 토스트 -->
+          <div id="saveToast" class="hidden p-2.5 bg-teal-50 border border-teal-200 text-teal-800 rounded-xl text-xs font-bold text-center">
+            ✓ 답안이 실시간 저장되었습니다!
           </div>
         </div>
 
-        <!-- 하단 네비게이션 버튼 바 -->
+        <!-- 하단 네비게이션 버튼 -->
         <div class="bg-slate-50 border-t border-slate-200 px-4 py-3 flex items-center justify-between">
-          <button id="btnPrev" onclick="navigateStep(-1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 flex items-center space-x-1 shadow-sm">
-            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-            <span>이전</span>
+          <button onclick="moveSlide(-1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 shadow-sm">
+            ◀ 이전
           </button>
-          <button onclick="saveCurrentStep()" class="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow flex items-center space-x-1">
-            <i data-lucide="save" class="w-4 h-4"></i>
-            <span>답안 저장</span>
+          <button onclick="saveCurrentData()" class="px-5 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow">
+            답안 저장
           </button>
-          <button id="btnNext" onclick="navigateStep(1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 flex items-center space-x-1 shadow-sm">
-            <span>다음</span>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <button onclick="moveSlide(1)" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 shadow-sm">
+            다음 ▶
           </button>
         </div>
 
       </div>
 
-      <!-- 최종 보고서 확인 & 제출 버튼 -->
-      <button onclick="openReportModal()" class="w-full py-3.5 bg-gradient-to-r from-teal-700 via-teal-600 to-slate-800 text-white rounded-2xl font-bold text-sm shadow-md flex items-center justify-center space-x-2 active:scale-98 transition">
-        <i data-lucide="send" class="w-4 h-4"></i>
+      <!-- 최종 보고서 확인 버튼 -->
+      <button onclick="openReportModal()" class="w-full py-3.5 bg-gradient-to-r from-teal-700 via-teal-600 to-slate-800 text-white rounded-2xl font-bold text-sm shadow-md flex items-center justify-center space-x-2">
         <span>모둠 전체 답안 검토 및 선생님께 전송</span>
       </button>
 
@@ -151,60 +129,17 @@
 
   </main>
 
-  <!-- QR 코드 스캐너 모달 -->
-  <div id="qrScannerModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-4 w-full max-w-sm flex flex-col items-center space-y-3">
-      <div class="w-full flex items-center justify-between">
-        <h3 class="text-sm font-bold text-slate-800">모둠 QR코드 스캔</h3>
-        <button onclick="closeQrScannerModal()" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div class="relative w-full aspect-square bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center">
-        <video id="qrVideo" class="w-full h-full object-cover"></video>
-        <canvas id="qrCanvas" class="hidden"></canvas>
-        <div class="absolute inset-8 border-2 border-dashed border-teal-400 rounded-lg pointer-events-none animate-pulse"></div>
-      </div>
-      <p class="text-xs text-slate-500 text-center">선생님이 나눠주신 QR코드를 네모 안에 맞춰주세요.</p>
-    </div>
-  </div>
-
-  <!-- 교사용 QR 발급 모달 -->
-  <div id="teacherModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <div>
-          <h3 class="font-bold text-sm text-slate-800">교사용: 모둠별 자동로그인 QR</h3>
-          <p class="text-[11px] text-slate-500">학생들에게 출력하거나 화면으로 보여주세요.</p>
-        </div>
-        <button onclick="toggleTeacherModal(false)" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3" id="teacherQrList"></div>
-      <div class="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
-        <button onclick="window.print()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow">
-          <i data-lucide="printer" class="w-4 h-4"></i>
-          <span>인쇄하기</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- 최종 결과 보고서 모달 -->
   <div id="reportModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+    <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <h3 class="font-bold text-sm text-slate-800" id="reportTitle">모둠 최종 탐구 답안</h3>
-        <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <h3 class="font-bold text-sm text-slate-800" id="reportHeaderTitle">탐구 보고서</h3>
+        <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-1">✕</button>
       </div>
-      <div class="p-4 overflow-y-auto space-y-3 text-xs" id="reportBody"></div>
+      <div class="p-4 overflow-y-auto space-y-3 text-xs" id="reportContent"></div>
       <div class="p-3 border-t border-slate-200 bg-slate-50 flex space-x-2">
-        <button onclick="copyReportText()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1">
-          <i data-lucide="copy" class="w-4 h-4"></i>
-          <span>전체 텍스트 복사</span>
+        <button onclick="copyToClipboard()" class="flex-1 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 shadow">
+          텍스트 복사 (카톡·패들렛 제출)
         </button>
         <button onclick="document.getElementById('reportModal').classList.add('hidden')" class="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">
           닫기
@@ -213,9 +148,8 @@
     </div>
   </div>
 
-  <!-- 슬라이드 데이터 및 인터랙션 로직 -->
   <script>
-    const SLIDES = [
+    const SLIDES_DATA = [
       {
         num: 1,
         title: "[1번]",
@@ -225,7 +159,7 @@
           <div class="grid grid-cols-3 gap-2">
             <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
               <span class="block text-xs font-bold mb-1 text-slate-700">왼쪽 문</span>
-              <select id="ans_1_left" class="w-full text-xs p-1.5 border rounded-lg bg-white">
+              <select id="ans_1_l" class="w-full text-xs p-1.5 border rounded-lg bg-white">
                 <option value="">선택</option>
                 <option value="왕(황제)">왕(황제)</option>
                 <option value="문관(동반)">문관(동반)</option>
@@ -234,7 +168,7 @@
             </div>
             <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
               <span class="block text-xs font-bold mb-1 text-slate-700">중간 문</span>
-              <select id="ans_1_mid" class="w-full text-xs p-1.5 border rounded-lg bg-white">
+              <select id="ans_1_m" class="w-full text-xs p-1.5 border rounded-lg bg-white">
                 <option value="">선택</option>
                 <option value="왕(황제)">왕(황제)</option>
                 <option value="문관(동반)">문관(동반)</option>
@@ -243,7 +177,7 @@
             </div>
             <div class="bg-slate-50 p-2 border border-slate-200 rounded-xl text-center">
               <span class="block text-xs font-bold mb-1 text-slate-700">오른쪽 문</span>
-              <select id="ans_1_right" class="w-full text-xs p-1.5 border rounded-lg bg-white">
+              <select id="ans_1_r" class="w-full text-xs p-1.5 border rounded-lg bg-white">
                 <option value="">선택</option>
                 <option value="왕(황제)">왕(황제)</option>
                 <option value="문관(동반)">문관(동반)</option>
@@ -273,7 +207,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">폭의 비를 측정한 방법 설명</label>
-              <input type="text" id="ans_2_how" placeholder="예: 신발 길이, 보폭, 줄자 등으로 측정" class="w-full text-xs p-2 border rounded-lg">
+              <input type="text" id="ans_2_how" placeholder="예: 신발 길이, 보폭 등으로 측정" class="w-full text-xs p-2 border rounded-lg">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">측정 사진/동영상 첨부</label>
@@ -315,7 +249,7 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">난간 장식 박쥐 촬영 사진 첨부</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">박쥐를 찾은 난간 사진 첨부</label>
               <input type="file" accept="image/*" capture="environment" id="ans_4_photo" class="text-xs w-full text-slate-500">
             </div>
           </div>
@@ -334,7 +268,7 @@
             </div>
             <div class="space-y-2">
               <label class="block text-xs font-bold text-slate-700">1. 세 전각의 오얏꽃 문양 사진 첨부</label>
-              <div class="space-y-1.5 text-xs text-slate-600">
+              <div class="space-y-1 text-xs text-slate-600">
                 <div>• 정관헌: <input type="file" accept="image/*" id="ans_5_f1" class="text-xs w-full"></div>
                 <div>• 석조전: <input type="file" accept="image/*" id="ans_5_f2" class="text-xs w-full"></div>
                 <div>• 덕홍전: <input type="file" accept="image/*" id="ans_5_f3" class="text-xs w-full"></div>
@@ -436,11 +370,11 @@
               <span class="block text-xs font-bold text-teal-900">🧭 중화전 앞마당 나침반 방위 측정</span>
               <p class="text-[11px] text-teal-800">품계석 근처에 서서 폰을 각 건물의 정면에 맞추고 기록하세요.</p>
               <div class="grid grid-cols-2 gap-2">
-                <button onclick="recordHeading('jh')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
+                <button type="button" onclick="recordHeading('jh')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
                   <span>1. 중화전 정면</span>
                   <span id="jhHeadingText" class="text-teal-600 mt-0.5">미측정</span>
                 </button>
-                <button onclick="recordHeading('sj')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
+                <button type="button" onclick="recordHeading('sj')" class="p-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-700 active:bg-teal-100 flex flex-col items-center">
                   <span>2. 석조전 정면</span>
                   <span id="sjHeadingText" class="text-teal-600 mt-0.5">미측정</span>
                 </button>
@@ -487,7 +421,8 @@
       }
     ];
 
-    let currentTeam = localStorage.getItem('deoksu_current_team') || '';
+    let currentTeamName = localStorage.getItem('deoksu_active_team') || '';
+    let currentTeamMembers = localStorage.getItem('deoksu_active_members') || '';
     let currentIdx = 0;
     let answersStore = JSON.parse(localStorage.getItem('deoksu_answers') || '{}');
     let currentDeviceHeading = 0;
@@ -495,18 +430,118 @@
     let headingSJ = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
       initCompass();
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const teamParam = urlParams.get('team');
-      if (teamParam) {
-        loginTeam(teamParam);
-      } else if (currentTeam) {
-        loginTeam(currentTeam);
+      if (currentTeamName) {
+        document.getElementById('inputTeamNum').value = currentTeamName;
+        document.getElementById('inputMembers').value = currentTeamMembers;
+        startAppView();
       }
     });
 
+    function handleStartTour() {
+      const teamNum = document.getElementById('inputTeamNum').value;
+      const members = document.getElementById('inputMembers').value.trim();
+
+      currentTeamName = teamNum;
+      currentTeamMembers = members;
+
+      localStorage.setItem('deoksu_active_team', currentTeamName);
+      localStorage.setItem('deoksu_active_members', currentTeamMembers);
+
+      startAppView();
+    }
+
+    function startAppView() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('missionDeck').classList.remove('hidden');
+      document.getElementById('btnOpenReport').classList.remove('hidden');
+      
+      const badgeText = currentTeamMembers 
+        ? `${currentTeamName} (${currentTeamMembers})` 
+        : `${currentTeamName} 활동 중`;
+      document.getElementById('navTeamInfo').innerText = badgeText;
+
+      renderTabs();
+      showSlide(0);
+    }
+
+    function renderTabs() {
+      const wrapper = document.getElementById('tabsWrapper');
+      wrapper.innerHTML = '';
+      SLIDES_DATA.forEach((s, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `flex-shrink-0 w-8 h-8 rounded-full text-xs font-bold border transition flex items-center justify-center ${
+          i === currentIdx
+            ? 'bg-teal-600 text-white border-teal-600 shadow'
+            : hasAnswer(s.num)
+            ? 'bg-teal-50 text-teal-700 border-teal-300'
+            : 'bg-white text-slate-500 border-slate-300'
+        }`;
+        btn.innerText = s.num;
+        btn.onclick = () => showSlide(i);
+        wrapper.appendChild(btn);
+      });
+    }
+
+    function showSlide(idx) {
+      currentIdx = idx;
+      const s = SLIDES_DATA[idx];
+
+      document.getElementById('viewSlideNum').innerText = s.title;
+      document.getElementById('viewSlideImg').src = s.img;
+      document.getElementById('viewSlideDesc').innerText = s.desc;
+      document.getElementById('viewInteractiveZone').innerHTML = s.render();
+
+      restoreSlideAnswers(s.num);
+      renderTabs();
+    }
+
+    function moveSlide(dir) {
+      saveCurrentData();
+      const next = currentIdx + dir;
+      if (next >= 0 && next < SLIDES_DATA.length) {
+        showSlide(next);
+      }
+    }
+
+    function saveCurrentData() {
+      const s = SLIDES_DATA[currentIdx];
+      if (!answersStore[currentTeamName]) answersStore[currentTeamName] = {};
+
+      const currentAnswers = {};
+      const inputs = document.querySelectorAll('#viewInteractiveZone input, #viewInteractiveZone select, #viewInteractiveZone textarea');
+      inputs.forEach(inp => {
+        if (inp.type === 'file') {
+          if (inp.files && inp.files[0]) currentAnswers[inp.id] = `[사진: ${inp.files[0].name}]`;
+        } else {
+          currentAnswers[inp.id] = inp.value;
+        }
+      });
+
+      answersStore[currentTeamName][s.num] = currentAnswers;
+      localStorage.setItem('deoksu_answers', JSON.stringify(answersStore));
+
+      renderTabs();
+      const toast = document.getElementById('saveToast');
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 1500);
+    }
+
+    function restoreSlideAnswers(num) {
+      if (!answersStore[currentTeamName] || !answersStore[currentTeamName][num]) return;
+      const data = answersStore[currentTeamName][num];
+      for (const [k, v] of Object.entries(data)) {
+        const el = document.getElementById(k);
+        if (el && el.type !== 'file') el.value = v;
+      }
+    }
+
+    function hasAnswer(num) {
+      return Boolean(answersStore[currentTeamName] && answersStore[currentTeamName][num]);
+    }
+
+    // 9번 나침반 방위 측정
     function initCompass() {
       if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', (e) => {
@@ -520,7 +555,7 @@
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(state => {
           if (state === 'granted') executeHeading(target);
-          else alert('나침반 권한이 필요합니다.');
+          else alert('나침반 권한을 허용해 주세요.');
         }).catch(() => executeHeading(target));
       } else {
         executeHeading(target);
@@ -551,207 +586,20 @@
       }
     }
 
-    function loginTeam(name) {
-      currentTeam = name;
-      localStorage.setItem('deoksu_current_team', currentTeam);
-      document.getElementById('loginCard').classList.add('hidden');
-      document.getElementById('missionDeck').classList.remove('hidden');
-      document.getElementById('navTeamBadge').innerText = `${currentTeam} 활동 중`;
-
-      renderTabs();
-      showSlide(0);
-    }
-
-    function manualLogin() {
-      const val = document.getElementById('teamSelect').value;
-      if (!val) {
-        alert('모둠을 선택하세요!');
-        return;
-      }
-      loginTeam(val);
-    }
-
-    function renderTabs() {
-      const wrapper = document.getElementById('tabsWrapper');
-      wrapper.innerHTML = '';
-      SLIDES.forEach((s, i) => {
-        const btn = document.createElement('button');
-        btn.className = `flex-shrink-0 w-8 h-8 rounded-full text-xs font-bold border transition flex items-center justify-center ${
-          i === currentIdx
-            ? 'bg-teal-600 text-white border-teal-600 shadow'
-            : hasAnswer(s.num)
-            ? 'bg-teal-50 text-teal-700 border-teal-300'
-            : 'bg-white text-slate-500 border-slate-300'
-        }`;
-        btn.innerText = s.num;
-        btn.onclick = () => showSlide(i);
-        wrapper.appendChild(btn);
-      });
-    }
-
-    function showSlide(idx) {
-      currentIdx = idx;
-      const s = SLIDES[idx];
-
-      document.getElementById('slideNumberTitle').innerText = s.title;
-      document.getElementById('slideMainImage').src = s.img;
-      document.getElementById('slideQuestionText').innerText = s.desc;
-      document.getElementById('interactiveZone').innerHTML = s.render();
-
-      restoreSlideAnswers(s.num);
-      renderTabs();
-      lucide.createIcons();
-    }
-
-    function navigateStep(dir) {
-      saveCurrentStep();
-      const next = currentIdx + dir;
-      if (next >= 0 && next < SLIDES.length) {
-        showSlide(next);
-      }
-    }
-
-    function saveCurrentStep() {
-      const s = SLIDES[currentIdx];
-      if (!answersStore[currentTeam]) answersStore[currentTeam] = {};
-
-      const currentAnswers = {};
-      const inputs = document.querySelectorAll('#interactiveZone input, #interactiveZone select, #interactiveZone textarea');
-      inputs.forEach(inp => {
-        if (inp.type === 'file') {
-          if (inp.files && inp.files[0]) currentAnswers[inp.id] = `[사진 첨부됨: ${inp.files[0].name}]`;
-        } else {
-          currentAnswers[inp.id] = inp.value;
-        }
-      });
-
-      answersStore[currentTeam][s.num] = currentAnswers;
-      localStorage.setItem('deoksu_answers', JSON.stringify(answersStore));
-
-      renderTabs();
-      const fb = document.getElementById('saveFeedback');
-      fb.classList.remove('hidden');
-      setTimeout(() => fb.classList.add('hidden'), 1500);
-    }
-
-    function restoreSlideAnswers(num) {
-      if (!answersStore[currentTeam] || !answersStore[currentTeam][num]) return;
-      const data = answersStore[currentTeam][num];
-      for (const [k, v] of Object.entries(data)) {
-        const el = document.getElementById(k);
-        if (el && el.type !== 'file') el.value = v;
-      }
-    }
-
-    function hasAnswer(num) {
-      return Boolean(answersStore[currentTeam] && answersStore[currentTeam][num]);
-    }
-
-    // QR 스캐너 로직
-    let videoStream = null;
-    let qrAnimationId = null;
-
-    function openQrScannerModal() {
-      document.getElementById('qrScannerModal').classList.remove('hidden');
-      const video = document.getElementById('qrVideo');
-
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(stream => {
-          videoStream = stream;
-          video.srcObject = stream;
-          video.setAttribute('playsinline', true);
-          video.play();
-          qrAnimationId = requestAnimationFrame(tickQr);
-        })
-        .catch(() => {
-          alert('카메라 접근 권한을 허용해주세요.');
-          closeQrScannerModal();
-        });
-    }
-
-    function tickQr() {
-      const video = document.getElementById('qrVideo');
-      const canvas = document.getElementById('qrCanvas');
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.height = video.videoHeight;
-        canvas.width = video.videoWidth;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imgData.data, imgData.width, imgData.height);
-
-        if (code) {
-          try {
-            const url = new URL(code.data);
-            const team = url.searchParams.get('team');
-            if (team) {
-              closeQrScannerModal();
-              loginTeam(team);
-              return;
-            }
-          } catch(e) {
-            if (code.data.includes('모둠')) {
-              closeQrScannerModal();
-              loginTeam(code.data);
-              return;
-            }
-          }
-        }
-      }
-      qrAnimationId = requestAnimationFrame(tickQr);
-    }
-
-    function closeQrScannerModal() {
-      if (videoStream) videoStream.getTracks().forEach(t => t.stop());
-      cancelAnimationFrame(qrAnimationId);
-      document.getElementById('qrScannerModal').classList.add('hidden');
-    }
-
-    // 교사용 QR 발급
-    function toggleTeacherModal(show) {
-      const modal = document.getElementById('teacherModal');
-      if (show) {
-        modal.classList.remove('hidden');
-        renderTeacherList();
-      } else {
-        modal.classList.add('hidden');
-      }
-    }
-
-    function renderTeacherList() {
-      const list = document.getElementById('teacherQrList');
-      list.innerHTML = '';
-      const teams = ['1모둠', '2모둠', '3모둠', '4모둠', '5모둠', '6모둠'];
-      const base = window.location.origin + window.location.pathname;
-
-      teams.forEach(t => {
-        const item = document.createElement('div');
-        item.className = 'p-3 border border-slate-200 rounded-xl flex items-center justify-between bg-slate-50';
-        const url = `${base}?team=${encodeURIComponent(t)}`;
-        const qrId = `qr_${t}`;
-        item.innerHTML = `
-          <div>
-            <h4 class="font-bold text-sm text-slate-800">${t}</h4>
-            <p class="text-[10px] text-slate-400 max-w-[190px] truncate">${url}</p>
-          </div>
-          <div id="${qrId}" class="p-1 bg-white rounded border"></div>
-        `;
-        list.appendChild(item);
-        new QRCode(document.getElementById(qrId), { text: url, width: 68, height: 68 });
-      });
-    }
-
-    // 최종 보고서 모달
+    // 결과 보고서
     function openReportModal() {
-      saveCurrentStep();
+      saveCurrentData();
       const modal = document.getElementById('reportModal');
-      const body = document.getElementById('reportBody');
-      const data = answersStore[currentTeam] || {};
+      const body = document.getElementById('reportContent');
+      const data = answersStore[currentTeamName] || {};
 
-      document.getElementById('reportTitle').innerText = `[${currentTeam}] 덕수궁 탐구 최종 답안`;
-      let html = `<div class="p-2.5 bg-slate-100 rounded-xl mb-2 font-bold">${currentTeam} 현장 탐구 기록</div>`;
+      document.getElementById('reportHeaderTitle').innerText = `[${currentTeamName}] 탐구 최종 답안`;
+      let html = `<div class="p-2.5 bg-slate-100 rounded-xl mb-2">
+        <p class="font-bold text-slate-800">${currentTeamName} 탐구 보고서</p>
+        <p class="text-[11px] text-slate-500">조원: ${currentTeamMembers || '미기재'}</p>
+      </div>`;
 
-      SLIDES.forEach(s => {
+      SLIDES_DATA.forEach(s => {
         const ans = data[s.num] || {};
         const entries = Object.entries(ans);
         html += `<div class="p-2.5 border rounded-lg bg-white space-y-1">
@@ -770,10 +618,10 @@
       modal.classList.remove('hidden');
     }
 
-    function copyReportText() {
-      const data = answersStore[currentTeam] || {};
-      let txt = `[덕수궁 탐구 결과 - ${currentTeam}]\n`;
-      SLIDES.forEach(s => {
+    function copyToClipboard() {
+      const data = answersStore[currentTeamName] || {};
+      let txt = `[덕수궁 탐구 결과 - ${currentTeamName}]\n조원: ${currentTeamMembers || '미기재'}\n`;
+      SLIDES_DATA.forEach(s => {
         txt += `\n${s.title}\n`;
         const ans = data[s.num] || {};
         const entries = Object.entries(ans);
@@ -786,7 +634,7 @@
       });
 
       navigator.clipboard.writeText(txt).then(() => {
-        alert('보고서 텍스트가 복사되었습니다! 카카오톡이나 패들렛에 붙여넣기 하세요.');
+        alert('보고서 내용이 복사되었습니다! 카톡이나 패들렛에 붙여넣기 하세요.');
       });
     }
   </script>
